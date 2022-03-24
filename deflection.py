@@ -35,6 +35,7 @@ def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
     #d = r_obs - l0*r_obs_norm*np.cos(chi)
     #d2 = r_obs_norm**2*np.sin(chi)**2
     dv = np.cross(l0, np.cross(v, l0))
+    print(f'd = {np.sqrt(d2)} km')
 
     if np.all(s==0) and J2==0 and R==0:
 
@@ -44,10 +45,11 @@ def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
         p3 = 2*d*((1-2*eps*np.dot(v, l0))*(np.dot(n, l0) - np.dot(n_obs, l0)))/d2
         p4 = r_obs_norm*(dv - 2*d*np.dot(v, d)/d2)/(d2*r_norm)
         p5 = r_norm - r_obs_norm - np.dot(n_obs, l0)*sigma
-        # print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
+        print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
 
         # evaluate deflection
         dl = -M*eps**2*(p1*p2 + p3) + 2*M*(eps**3)*p4*p5
+        print(f'dl: {dl}')
 
         return dl
     else:
@@ -81,6 +83,71 @@ def quadru(i):
         sJ2[j] = s[j]
 
     return sJ2
+
+# modificare l0*[sinchi, coschi, 0]
+def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
+    """
+    :param l0: unpertubed direction, 3-array
+    :param x: source position [km], 3-array
+    :param x_a: mass position [km], 3-array
+    :param x_obs: observer position [km], 3-array
+    :param eps: 1/c
+    :param v: mass velocity, 3-array
+    :param M: gravitational parameter, mass*G
+    :param chi: sight angle
+    :param s: spin vector, 3-array
+    :param J2: planet oblateness
+    :param R: planet radius [km]
+    :return: dl, perturbed direction
+    """
+
+    # evaluate distance mass-source
+    r = x - x_a
+    # evaluate distance mass-observer
+    r_obs = x_obs - x_a
+
+    # evaluate vector norm
+    r_norm = np.linalg.norm(r)
+    r_obs_norm = np.linalg.norm(r_obs)
+
+    # evaluate normal vectors
+    n = r/r_norm
+    n_obs = r_obs/r_obs_norm
+
+    # evaluate parameters
+    sigma = np.dot(x-x_obs, l0)
+    # d = r_obs - l0*np.dot(r_obs, l0)
+    # d2 = r_obs_norm**2 - (np.dot(r_obs, l0))**2
+    d = r_obs - l0*r_obs_norm*np.cos(chi)
+    d2 = r_obs_norm**2*np.sin(chi)**2
+    dv = np.cross(l0, np.cross(v, l0))
+    print(f'd = {np.sqrt(d2)} km')
+
+    if np.all(s==0) and J2==0 and R==0:
+
+        # evaluate useful combinations
+        p1 = 1/r_norm - 1/r_obs_norm
+        p2 = l0 - 2*eps*(2*dv - d*np.dot(v, r_obs)/d2)
+        p3 = 2*d*((1-2*eps*np.dot(v, l0))*(np.dot(n, l0) - np.dot(n_obs, l0)))/d2
+        p4 = r_obs_norm*(dv - 2*d*np.dot(v, d)/d2)/(d2*r_norm)
+        p5 = r_norm - r_obs_norm - np.dot(n_obs, l0)*sigma
+        print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
+
+        # evaluate deflection
+        dl = -M*eps**2*(p1*p2 + p3) + 2*M*(eps**3)*p4*p5
+        print(f'dl: {dl}')
+
+        return dl
+    else:
+        n = -d/np.linalg.norm(d)
+        t = l0
+        m = np.cross(t, n)
+        p2 = (((J2*R**2)/d2) * (1 - np.dot(s, t)**2 - 2*np.dot(s, n)**2))*n
+        p3 = (((J2*R**2)/d2)*np.dot(s, m)*np.dot(s, n))*m
+        dl = ((4*M*eps**2)/np.sqrt(d2))*(p2 + p3)
+        # print(f'd = {np.sqrt(d2)}')
+
+        return dl
 
 
 if __name__ == "__main__":
