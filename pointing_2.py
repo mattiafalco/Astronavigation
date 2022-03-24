@@ -35,7 +35,7 @@ sources_v = np.insert(v_p, 0, v_s, axis=0)
 #print(sources_x)
 
 # star
-dist = 2300*pc
+dist = 1.3012*pc
 x = np.array([0, dist, 0])
 l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
 
