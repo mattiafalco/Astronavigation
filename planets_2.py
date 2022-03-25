@@ -4,9 +4,88 @@ from astropy.time import Time
 from calcephpy import *
 from deflection import quadru
 
+
+def read_from_INPOP(pl, date):
+    """
+    Read the information from the INPOP catalogue
+
+    Parameters
+    ----------
+    pl : str
+        body name
+    date : str
+        iso date
+
+    Returns
+    -------
+    list :
+        position
+    list :
+        velocity
+    """
+
+    dic = {'sun': NaifId.SUN,
+           'mercury': NaifId.MERCURY_BARYCENTER,
+           'venus': NaifId.VENUS_BARYCENTER,
+           'earth': NaifId.EARTH,
+           'mars': NaifId.MARS_BARYCENTER,
+           'jupiter': NaifId.JUPITER_BARYCENTER,
+           'saturn': NaifId.SATURN_BARYCENTER,
+           'uranus': NaifId.URANUS_BARYCENTER,
+           'neptune': NaifId.NEPTUNE_BARYCENTER}
+
+    if pl not in dic:
+        raise ValueError(f'{pl} is not an implemented body.')
+
+
+    peph = CalcephBin.open("inpop21a_TCB_m1000_p1000_tcg.dat")
+    t = Time(date, format='isot', scale='utc')
+    jd0 = t.jd
+    dt = 0.0
+    PV = peph.compute_unit(jd0, dt, dic[pl], NaifId.SUN,
+                           Constants.UNIT_KM + Constants.UNIT_SEC + Constants.USE_NAIFID)
+    peph.close()
+
+    return PV[0:3], PV[3:6]
+
+
 class Body(object):
+    """
+    A class used to represent a celestial body.
+
+    Attributes
+    ----------
+    mass : float
+        body mass (in kg)
+    pos : 3-array
+        body position (in km)
+    vel : 3-array
+        body velocity (in km/s)
+    radius : float
+        body radius (in km)
+    s : 3-array
+        rotation vector
+    J2 : float
+        body J2 parameter
+    """
 
     def __init__(self, mass, pos, vel=np.array([0, 0, 0]), radius=0, s=np.array([0, 0, 0]), J2=0):
+        """
+        Parameters
+        ----------
+        mass : float
+            body mass (in kg)
+        pos : 3-array
+            body position (in km)
+        vel : 3-array
+            body velocity (in km/s)
+        radius : float
+            body radius (in km)
+        s : 3-array
+            rotation vector
+        J2 : float
+            body J2 parameter
+        """
         self.mass = mass
         self.pos = pos
         self.vel = vel
@@ -22,14 +101,37 @@ class Body(object):
         return str
 
 class SolarSystem(object):
+    """
+    A class used to encode the Solar System information and to evaluate the dynamical elements of its bodies
+    either in a simplified version of circular and coplanar orbits either using the ephemerides taken from
+    the INPOP catalogue.
+
+    Attributes
+    ----------
+    ephemerides : bool
+        use or not use the ephemerides catalogue (default False)
+    b_names : list
+        names of all the Solar System bodies
+    bodies : dict
+        dictionary of all the object type Body
+    """
 
     def __init__(self, ephemerides=False):
+        """
+        Create the Solar System with all its bodies.
+
+        Parameters
+        ----------
+        ephemerides : bool
+            use or not use the ephemerides catalogue (default False)
+        """
 
         self.ephemerides = ephemerides
 
         self.b_names = ['sun', 'mercury', 'venus', 'earth', 'mars', 'jupiter',
                         'saturn', 'uranus', 'neptune']
 
+        # position, velocity, mass*G, radius
         p = {'sun': 0, 'mercury': 57.909e6, 'venus': 108.210e6, 'earth': 149.598e6, 'mars': 227.956e6,
              'jupiter': 778412010, 'saturn': 1426725400, 'uranus': 2870972200, 'neptune': 4498252900}
         v = {'sun': 0, 'mercury': 47.36, 'venus': 35.02, 'earth': 29.78, 'mars': 24.07, 'jupiter': 13.0697,
@@ -40,11 +142,14 @@ class SolarSystem(object):
              'neptune': 6.83653406400e6}
         r = {'sun': 6.955e5, 'mercury': 2439.7, 'venus': 6051.8, 'earth': 6371.01, 'mars': 3389.9, 'jupiter': 69911,
              'saturn': 58232, 'uranus': 25362, 'neptune': 24624}
+
+        # rotation vector, J2 parameter
         s = {}
         J2 = {}
         for pl in self.b_names:
             s[pl], J2[pl] = quadru(pl)
 
+        # create bodies dictionary with all planets on the y-axis
         bodies = {}
         for pl in self.b_names:
             x_b = p[pl]*np.array([0, 1, 0])
@@ -53,6 +158,18 @@ class SolarSystem(object):
         self.bodies = bodies
 
     def getSun(self, date='2000-01-01T12:00:00'):
+        """
+        Return the Sun in a specified position given by the date
+        Parameters
+        ----------
+        date : str
+            iso date
+
+        Returns
+        -------
+        Body
+            required body object in the given position
+        """
 
         if not self.ephemerides:
             return self.bodies['sun']
@@ -77,11 +194,28 @@ class SolarSystem(object):
             return Body(m_s, x_s, v_s, r_s, s_s, J2_s)
 
     def getPlanet(self, pl, date='2000-01-01T12:00:00', anom=np.pi/2):
+        """
+        Return the required body in a specified position given by the date or the anomaly parameter
+
+        Parameters
+        ----------
+        pl : str
+            body name
+        date : str
+            iso date
+        anom : float
+            angle
+
+        Returns
+        -------
+        Body
+            required body object in the given position
+        """
 
         if not self.ephemerides:
-            m_p = self.bodies[pl].mass
             x_p = np.linalg.norm(self.bodies[pl].pos) * np.array([np.cos(anom), np.sin(anom), 0])
             v_p = np.linalg.norm(self.bodies[pl].vel) * np.array([-np.sin(anom), np.cos(anom), 0])
+            m_p = self.bodies[pl].mass
             r_p = self.bodies[pl].radius
             s_p = self.bodies[pl].s
             J2_p = self.bodies[pl].J2
@@ -89,40 +223,20 @@ class SolarSystem(object):
 
             return planet
         else:
-            dic = {'sun': NaifId.SUN,
-                   'mercury': NaifId.MERCURY_BARYCENTER,
-                   'venus': NaifId.VENUS_BARYCENTER,
-                   'earth': NaifId.EARTH,
-                   'mars': NaifId.MARS_BARYCENTER,
-                   'jupiter': NaifId.JUPITER_BARYCENTER,
-                   'saturn': NaifId.SATURN_BARYCENTER,
-                   'uranus': NaifId.URANUS_BARYCENTER,
-                   'neptune': NaifId.NEPTUNE_BARYCENTER}
-
-            peph = CalcephBin.open("inpop21a_TCB_m1000_p1000_tcg.dat")
-            t = Time(date, format='isot', scale='utc')
-            jd0 = t.jd
-            dt = 0.0
-            PV = peph.compute_unit(jd0, dt, dic[pl], NaifId.SUN,
-                                   Constants.UNIT_KM + Constants.UNIT_SEC + Constants.USE_NAIFID)
-            pos = PV[0:3]
-            vel = PV[3:6]
-            peph.close()
-
-            x_p = np.array(pos)
-            v_p = np.array(vel)
+            x_p, v_p = read_from_INPOP(pl, date)
             m_p = self.bodies[pl].mass
             r_p = self.bodies[pl].radius
             s_p = self.bodies[pl].s
             J2_p = self.bodies[pl].J2
+
             return Body(m_p, x_p, v_p, r_p, s_p, J2_p)
 
 if __name__ == '__main__':
 
     print('\n------------- Tests with no ephemerides ------------\n')
     ss = SolarSystem()
-    print(ss.getSun())
-    print(ss.getPlanet('jupiter'))
+    print(f'Sun {ss.getSun()}\n')
+    print(f'jupiter {ss.getPlanet("jupiter")}\n')
 
     ss = SolarSystem(ephemerides=True)
 
@@ -131,5 +245,8 @@ if __name__ == '__main__':
     print(f'sun second function {ss.getPlanet("sun")}\n')
     print(f'jupiter {ss.getPlanet("jupiter")}\n')
     print(f'earth {ss.getPlanet("earth")}\n')
-    print(f'earth orbital radius: {np.linalg.norm(ss.getPlanet("earth").pos)}')
+    print(f'earth orbital radius: {np.linalg.norm(ss.getPlanet("earth").pos)}\n')
+    # read_from_INPOP('PCB', '2000-01-01T12:00:00')
 
+    day = '2050-01-01T12:00:00'
+    print(f'mars, day = {day} {ss.getPlanet("mars", day)}')

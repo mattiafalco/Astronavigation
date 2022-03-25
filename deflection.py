@@ -1,19 +1,43 @@
 import numpy as np
 
-def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
+
+def deflection(l0: np.ndarray, x: np.ndarray, x_a: np.ndarray, x_obs: np.ndarray, eps: float, v: np.ndarray, M: float,
+               s: np.ndarray = np.array([0, 0, 0]), J2: float = 0, R: float = 0) -> np.ndarray:
     """
-    :param l0: unperturbed direction, 3-array
-    :param x: source position [km], 3-array
-    :param x_a: mass position [km], 3-array
-    :param x_obs: observer position [km], 3-array
-    :param eps: 1/c
-    :param v: mass velocity, 3-array
-    :param M: gravitational parameter, mass*G
-    :param s: spin vector, 3-array
-    :param J2: planet oblateness
-    :param R: planet radius [km]
-    :return: dl, perturbed direction
+    Evaluate  the difference between the unperturbed direction l0 and the perturbed direction. If one of the last three
+    parameters is set to its default value it evaluates the monopole contribution whereas it evaluates only the
+    quadrupole contribution.
+
+    Parameters
+    ----------
+    l0 : 3-array
+        unperturbed direction
+    x : 3-array
+        source position (in km)
+    x_a : 3-array
+        mass position (in km)
+    x_obs : 3 array
+        observer position (in km)
+    eps : float
+        small parameter, usually 1/c (in s/km)
+    v : 3-array
+        mass velocity (in km/s)
+    M : float
+        mass parameter m*G (in km3/s2)
+    s : 3-array
+        rotation vector (default is [0,0,0])
+    J2 : float
+        oblateness parameter (default is 0)
+    R : float
+        mass radius (in km, default is 0)
+
+    Returns
+    -------
+    3-array
+        perturbation on the direction of observation
     """
+    # debug parameter, if true print some information
+    debug = False
 
     # evaluate distance mass-source
     r = x - x_a
@@ -32,12 +56,11 @@ def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
     sigma = np.dot(x-x_obs, l0)
     d = r_obs - l0*np.dot(r_obs, l0)
     d2 = r_obs_norm**2 - (np.dot(r_obs, l0))**2
-    #d = r_obs - l0*r_obs_norm*np.cos(chi)
-    #d2 = r_obs_norm**2*np.sin(chi)**2
     dv = np.cross(l0, np.cross(v, l0))
-    # print(f'd = {np.sqrt(d2)} km')
 
-    if np.all(s==0) and J2==0 and R==0:
+    if debug: print(f'd = {np.sqrt(d2)} km')
+
+    if np.all(s == 0) and J2 == 0 and R == 0:
 
         # evaluate useful combinations
         p1 = 1/r_norm - 1/r_obs_norm
@@ -45,26 +68,50 @@ def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
         p3 = 2*d*((1-2*eps*np.dot(v, l0))*(np.dot(n, l0) - np.dot(n_obs, l0)))/d2
         p4 = r_obs_norm*(dv - 2*d*np.dot(v, d)/d2)/(d2*r_norm)
         p5 = r_norm - r_obs_norm - np.dot(n_obs, l0)*sigma
-        # print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
+
+        if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
 
         # evaluate deflection
         dl = -M*eps**2*(p1*p2 + p3) + 2*M*(eps**3)*p4*p5
-        # print(f'dl: {dl}')
+
+        if debug: print(f'dl: {dl}')
 
         return dl
     else:
+        # define three ON vectors
         n = -d/np.linalg.norm(d)
         t = l0
         m = np.cross(t, n)
+
+        # evaluate useful combinations
         p2 = (((J2*R**2)/d2) * (1 - np.dot(s, t)**2 - 2*np.dot(s, n)**2))*n
         p3 = (((J2*R**2)/d2)*np.dot(s, m)*np.dot(s, n))*m
+
+        # evaluate deflection
         dl = ((4*M*eps**2)/np.sqrt(d2))*(p2 + p3)
-        # print(f'd = {np.sqrt(d2)}')
+
+        if debug: print(f'd = {np.sqrt(d2)}')
 
         return dl
 
 
-def quadru(pl):
+def quadru(pl: str):
+
+    """
+    Evaluate the rotation vector and the J2 parameter of a given body of the Solar System.
+
+    Parameters
+    ----------
+    pl : str
+        body name
+
+    Returns
+    -------
+    3-array
+        rotation vector
+    float
+        J2 parameter
+    """
 
     alpha = 0
     delta = 0
@@ -88,19 +135,44 @@ def quadru(pl):
 
 def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
     """
-    :param l0: unperturbed direction, 3-array
-    :param x: source position [km], 3-array
-    :param x_a: mass position [km], 3-array
-    :param x_obs: observer position [km], 3-array
-    :param eps: 1/c
-    :param v: mass velocity, 3-array
-    :param M: gravitational parameter, mass*G
-    :param chi: sight angle
-    :param s: spin vector, 3-array
-    :param J2: planet oblateness
-    :param R: planet radius [km]
-    :return: dl, perturbed direction
+    Evaluate  the difference between the unperturbed direction l0 and the perturbed direction with
+    a given impact parameter. One should use this function for tests onl. If one of the last three
+    parameters is set to its default value it evaluates the monopole contribution whereas it evaluates
+    only the quadrupole contribution.
+
+    Parameters
+    ----------
+    l0 : 3-array
+        unperturbed direction
+    x : 3-array
+        source position (in km)
+    x_a : 3-array
+        mass position (in km)
+    x_obs : 3 array
+        observer position (in km)
+    eps : float
+        small parameter, usually 1/c (in s/km)
+    v : 3-array
+        mass velocity (in km/s)
+    M : float
+        mass parameter m*G (in km3/s2)
+    chi : float
+        view angle (in rad)
+    s : 3-array
+        rotation vector (default is [0,0,0])
+    J2 : float
+        oblateness parameter (default is 0)
+    R : float
+        mass radius (in km, default is 0)
+
+    Returns
+    -------
+    3-array
+        perturbation on the direction of observation
     """
+
+    # debug parameter, if true print some information
+    debug = False
 
     # evaluate distance mass-source
     r = x - x_a
@@ -117,14 +189,13 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
 
     # evaluate parameters
     sigma = np.dot(x-x_obs, l0)
-    # d = r_obs - l0*np.dot(r_obs, l0)
-    # d2 = r_obs_norm**2 - (np.dot(r_obs, l0))**2
     d = r_obs - l0*r_obs_norm*np.cos(chi)
     d2 = r_obs_norm**2*np.sin(chi)**2
     dv = np.cross(l0, np.cross(v, l0))
-    # print(f'd = {np.sqrt(d2)} km')
 
-    if np.all(s==0) and J2==0 and R==0:
+    if debug: print(f'd = {np.sqrt(d2)} km')
+
+    if np.all(s == 0) and J2 == 0 and R == 0:
 
         # evaluate useful combinations
         p1 = 1/r_norm - 1/r_obs_norm
@@ -132,11 +203,13 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
         p3 = 2*d*((1-2*eps*np.dot(v, l0))*(np.dot(n, l0) - np.dot(n_obs, l0)))/d2
         p4 = r_obs_norm*(dv - 2*d*np.dot(v, d)/d2)/(d2*r_norm)
         p5 = r_norm - r_obs_norm - np.dot(n_obs, l0)*sigma
-        # print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
+
+        if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
 
         # evaluate deflection
         dl = -M*eps**2*(p1*p2 + p3) + 2*M*(eps**3)*p4*p5
-        # print(f'dl: {dl}')
+
+        if debug: print(f'dl: {dl}')
 
         return dl
     else:
@@ -146,7 +219,8 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
         p2 = (((J2*R**2)/d2) * (1 - np.dot(s, t)**2 - 2*np.dot(s, n)**2))*n
         p3 = (((J2*R**2)/d2)*np.dot(s, m)*np.dot(s, n))*m
         dl = ((4*M*eps**2)/np.sqrt(d2))*(p2 + p3)
-        # print(f'd = {np.sqrt(d2)}')
+
+        if debug: print(f'd = {np.sqrt(d2)}')
 
         return dl
 

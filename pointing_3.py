@@ -16,7 +16,7 @@ g = -np.pi/2 + 6.955e5/AU  # constants.R_sun.to('km').value/AU
 x_obs = AU*np.array([np.cos(g), np.sin(g), 0])
 
 # star
-dist = 2300*pc
+dist = 1.3012*pc
 x = np.array([0, dist, 0])
 l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
 

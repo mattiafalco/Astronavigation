@@ -43,4 +43,18 @@ for x in x_stars:
     print(f'pointing errors: {dr/AU} AU')
     print(f'pointing errors - sun: {(dr-dr[0])/AU} AU')
 
+    # quadrupole jupiter-saturn
+    list_q = ['jupiter', 'saturn']
+    planets_q = [ss.getPlanet(pl) for pl in list_q]
+
+    dlq = []
+    for i in range(len(planets_q)):
+        chi = planets_q[i].radius/np.linalg.norm(x_obs-planets_q[i].pos)
+        l0q = -np.array([np.sin(chi), np.cos(chi), 0])
+        dls = deflection_mod(l0q, x, planets_q[i].pos, x_obs, eps, planets_q[i].vel, planets_q[i].mass, chi,
+                             planets_q[i].s, planets_q[i].J2, planets_q[i].radius)
+        dlq.append(np.linalg.norm(dls))
+    dlq = np.cumsum(np.array(dlq))
+    drq = np.linalg.norm(x-x_obs)*dlq
+    print(f'quadrupole jup-sat: {drq/AU} AU')
 
