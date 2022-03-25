@@ -2,7 +2,7 @@ import numpy as np
 
 def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
     """
-    :param l0: unpertubed direction, 3-array
+    :param l0: unperturbed direction, 3-array
     :param x: source position [km], 3-array
     :param x_a: mass position [km], 3-array
     :param x_obs: observer position [km], 3-array
@@ -35,7 +35,7 @@ def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
     #d = r_obs - l0*r_obs_norm*np.cos(chi)
     #d2 = r_obs_norm**2*np.sin(chi)**2
     dv = np.cross(l0, np.cross(v, l0))
-    print(f'd = {np.sqrt(d2)} km')
+    # print(f'd = {np.sqrt(d2)} km')
 
     if np.all(s==0) and J2==0 and R==0:
 
@@ -45,11 +45,11 @@ def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
         p3 = 2*d*((1-2*eps*np.dot(v, l0))*(np.dot(n, l0) - np.dot(n_obs, l0)))/d2
         p4 = r_obs_norm*(dv - 2*d*np.dot(v, d)/d2)/(d2*r_norm)
         p5 = r_norm - r_obs_norm - np.dot(n_obs, l0)*sigma
-        print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
+        # print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
 
         # evaluate deflection
         dl = -M*eps**2*(p1*p2 + p3) + 2*M*(eps**3)*p4*p5
-        print(f'dl: {dl}')
+        # print(f'dl: {dl}')
 
         return dl
     else:
@@ -64,30 +64,31 @@ def deflection(l0, x, x_a, x_obs, eps, v, M, s=0, J2=0, R=0):
         return dl
 
 
-def quadru(i):
+def quadru(pl):
 
-    sJ2 = np.zeros(4)
+    alpha = 0
+    delta = 0
+    J2 = 0
 
-    if i == 1:
+    if pl == 'jupiter':
         alpha = np.deg2rad(268.057)
         delta = np.deg2rad(64.495)
-        sJ2[3] = 14736e-6
-    elif i == 2:
+        J2 = 14736e-6
+    elif pl == 'saturn':
         alpha = np.deg2rad(40.589)
         delta = np.deg2rad(83.537)
-        sJ2[3] = 16298e-6
+        J2 = 16298e-6
+    else:
+        pass
 
     s = [np.cos(alpha)*np.cos(delta), np.sin(alpha)*np.cos(delta), np.sin(delta)]
 
-    for j in range(len(s)):
-        sJ2[j] = s[j]
+    return s, J2
 
-    return sJ2
 
-# modificare l0*[sinchi, coschi, 0]
 def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
     """
-    :param l0: unpertubed direction, 3-array
+    :param l0: unperturbed direction, 3-array
     :param x: source position [km], 3-array
     :param x_a: mass position [km], 3-array
     :param x_obs: observer position [km], 3-array
@@ -121,7 +122,7 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
     d = r_obs - l0*r_obs_norm*np.cos(chi)
     d2 = r_obs_norm**2*np.sin(chi)**2
     dv = np.cross(l0, np.cross(v, l0))
-    print(f'd = {np.sqrt(d2)} km')
+    # print(f'd = {np.sqrt(d2)} km')
 
     if np.all(s==0) and J2==0 and R==0:
 
@@ -131,11 +132,11 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
         p3 = 2*d*((1-2*eps*np.dot(v, l0))*(np.dot(n, l0) - np.dot(n_obs, l0)))/d2
         p4 = r_obs_norm*(dv - 2*d*np.dot(v, d)/d2)/(d2*r_norm)
         p5 = r_norm - r_obs_norm - np.dot(n_obs, l0)*sigma
-        print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
+        # print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
 
         # evaluate deflection
         dl = -M*eps**2*(p1*p2 + p3) + 2*M*(eps**3)*p4*p5
-        print(f'dl: {dl}')
+        # print(f'dl: {dl}')
 
         return dl
     else:
@@ -173,31 +174,31 @@ if __name__ == "__main__":
     # print(dls)
     print(f'dl_n mono = {np.rad2deg(((np.linalg.norm(dls)))) * 3600 * 1e6} muas')
 
-    print('\n--------------- test -------------\nquadrupole deflection at chi = 22 as')
-
-    ang = 22/3600
-    chi = np.deg2rad(ang)
-    star = 1 * pc
-
-    x_a = np.array([0, 5.2 * AU, 0])  # Jupiter
-    x_obs = np.array([0, AU + 1.5e6, 0])  # L2
-    x = np.array([star * np.sin(chi), AU + 1.5e6 + star * np.cos(chi), 0])
-    eps = 1 / c
-    v = np.array([0, 0, 0])
-    MG = 1.26686534e8
-    l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
-
-    #print(f'exp_chi = {np.rad2deg(np.arcsin(R/(np.linalg.norm(x_obs-x_a))))*3600}')
-    print(f'exp_chi = {np.rad2deg(np.arctan(R/(4.2*AU-1.5e6)))*3600} as')
-
-    sJ2 = quadru(1)
-
-    s = sJ2[:3]
-    J2 = sJ2[3]
-
-    dls = deflection(l0, x, x_a, x_obs, eps, v, MG, s, J2, R)
-    dln = dls - l0*np.dot(dls, l0)
-    print(f'dl_n quadru = {np.rad2deg(np.linalg.norm(dln))*3600*1e6} muas')
+    # print('\n--------------- test -------------\nquadrupole deflection at chi = 22 as')
+    #
+    # ang = 22/3600
+    # chi = np.deg2rad(ang)
+    # star = 1 * pc
+    #
+    # x_a = np.array([0, 5.2 * AU, 0])  # Jupiter
+    # x_obs = np.array([0, AU + 1.5e6, 0])  # L2
+    # x = np.array([star * np.sin(chi), AU + 1.5e6 + star * np.cos(chi), 0])
+    # eps = 1 / c
+    # v = np.array([0, 0, 0])
+    # MG = 1.26686534e8
+    # l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
+    #
+    # #print(f'exp_chi = {np.rad2deg(np.arcsin(R/(np.linalg.norm(x_obs-x_a))))*3600}')
+    # print(f'exp_chi = {np.rad2deg(np.arctan(R/(4.2*AU-1.5e6)))*3600} as')
+    #
+    # sJ2 = quadru(1)
+    #
+    # s = sJ2[:3]
+    # J2 = sJ2[3]
+    #
+    # dls = deflection(l0, x, x_a, x_obs, eps, v, MG, s, J2, R)
+    # dln = dls - l0*np.dot(dls, l0)
+    # print(f'dl_n quadru = {np.rad2deg(np.linalg.norm(dln))*3600*1e6} muas')
 
     print('\n--------------- test -------------\nmonopole deflection Sun + Jupiter')
 
