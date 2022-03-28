@@ -7,7 +7,8 @@ from deflection import quadru
 
 def read_from_INPOP(pl, date):
     """
-    Read the information from the INPOP catalogue
+    Read the information from the INPOP catalogue and returns position and velocity of the
+    required body.
 
     Parameters
     ----------
@@ -38,7 +39,6 @@ def read_from_INPOP(pl, date):
     if pl not in dic:
         raise ValueError(f'{pl} is not an implemented body.')
 
-
     peph = CalcephBin.open("inpop21a_TCB_m1000_p1000_tcg.dat")
     t = Time(date, format='isot', scale='utc')
     jd0 = t.jd  # -2400000.5 - 51544.5
@@ -57,7 +57,7 @@ class Body(object):
     Attributes
     ----------
     mass : float
-        body mass (in kg)
+        body mass*G (in km3/s2)
     pos : 3-array
         body position (in km)
     vel : 3-array
@@ -75,14 +75,14 @@ class Body(object):
         Parameters
         ----------
         mass : float
-            body mass (in kg)
-        pos : 3-array
+            body mass*G (in km3/s2)
+        pos : np.ndarray
             body position (in km)
-        vel : 3-array
+        vel : np.ndarray
             body velocity (in km/s)
         radius : float
             body radius (in km)
-        s : 3-array
+        s : np.ndarray
             rotation vector
         J2 : float
             body J2 parameter
@@ -135,15 +135,14 @@ class SolarSystem(object):
         # position, velocity, mass*G, radius
         p = {'sun': 0, 'mercury': 57.909e6, 'venus': 108.210e6, 'earth': 149.598e6, 'mars': 227.956e6,
              'jupiter': 778412010, 'saturn': 1426725400, 'uranus': 2870972200, 'neptune': 4498252900,
-             'moon': 149.598e6+0.3633e6}
+             'moon': 149.598e6+0.3633e6}  # km
         v = {'sun': 0, 'mercury': 47.36, 'venus': 35.02, 'earth': 29.78, 'mars': 24.07, 'jupiter': 13.0697,
-             'saturn': 9.6724, 'uranus': 6.8352, 'neptune': 5.4778, 'moon': 29.78}
-        # m = [132712e6, 126.687e6, 37.931e6, 5.7940e6, 6.8351e6]
+             'saturn': 9.6724, 'uranus': 6.8352, 'neptune': 5.4778, 'moon': 29.78}  # km/s
         m = {'sun': 1.32712440017987e11, 'mercury': 2.203208e4, 'venus': 3.24858599e5, 'earth': 3.98600433e5,
              'mars': 4.2828314e4, 'jupiter': 1.26712767863e8, 'saturn': 3.79406260630e7, 'uranus': 5.79454900700e6,
-             'neptune': 6.83653406400e6, 'moon': 0.0049e6}
+             'neptune': 6.83653406400e6, 'moon': 0.0049e6}  # km3/s2
         r = {'sun': 6.955e5, 'mercury': 2439.7, 'venus': 6051.8, 'earth': 6371.01, 'mars': 3389.9, 'jupiter': 69911,
-             'saturn': 58232, 'uranus': 25362, 'neptune': 24624, 'moon': 1737}
+             'saturn': 58232, 'uranus': 25362, 'neptune': 24624, 'moon': 1737}  # km
 
         # rotation vector, J2 parameter
         s = {}
@@ -155,7 +154,7 @@ class SolarSystem(object):
         bodies = {}
         for pl in self.b_names:
             x_b = p[pl]*np.array([0, 1, 0])
-            v_b = v[pl] * np.array([0, 1, 0])
+            v_b = v[pl] * np.array([-1, 0, 0])
             bodies[pl] = Body(m[pl], x_b, v_b, r[pl], s[pl], J2[pl])
         self.bodies = bodies
 
@@ -221,9 +220,8 @@ class SolarSystem(object):
             r_p = self.bodies[pl].radius
             s_p = self.bodies[pl].s
             J2_p = self.bodies[pl].J2
-            planet = Body(m_p, x_p, v_p, r_p, s_p, J2_p)
 
-            return planet
+            return Body(m_p, x_p, v_p, r_p, s_p, J2_p)
         else:
             x_p, v_p = read_from_INPOP(pl, date)
             m_p = self.bodies[pl].mass

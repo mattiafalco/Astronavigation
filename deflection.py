@@ -151,7 +151,7 @@ def quadru(pl: str):
     else:
         pass
 
-    s = [np.cos(alpha)*np.cos(delta), np.sin(alpha)*np.cos(delta), np.sin(delta)]
+    s = np.array([np.cos(alpha)*np.cos(delta), np.sin(alpha)*np.cos(delta), np.sin(delta)])
 
     return s, J2
 
