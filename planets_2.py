@@ -32,7 +32,8 @@ def read_from_INPOP(pl, date):
            'jupiter': NaifId.JUPITER_BARYCENTER,
            'saturn': NaifId.SATURN_BARYCENTER,
            'uranus': NaifId.URANUS_BARYCENTER,
-           'neptune': NaifId.NEPTUNE_BARYCENTER}
+           'neptune': NaifId.NEPTUNE_BARYCENTER,
+           'moon': NaifId.MOON}
 
     if pl not in dic:
         raise ValueError(f'{pl} is not an implemented body.')
@@ -40,13 +41,13 @@ def read_from_INPOP(pl, date):
 
     peph = CalcephBin.open("inpop21a_TCB_m1000_p1000_tcg.dat")
     t = Time(date, format='isot', scale='utc')
-    jd0 = t.jd
+    jd0 = t.jd  # -2400000.5 - 51544.5
     dt = 0.0
     PV = peph.compute_unit(jd0, dt, dic[pl], NaifId.SUN,
                            Constants.UNIT_KM + Constants.UNIT_SEC + Constants.USE_NAIFID)
     peph.close()
 
-    return PV[0:3], PV[3:6]
+    return np.array(PV[0:3]), np.array(PV[3:6])
 
 
 class Body(object):
@@ -129,19 +130,20 @@ class SolarSystem(object):
         self.ephemerides = ephemerides
 
         self.b_names = ['sun', 'mercury', 'venus', 'earth', 'mars', 'jupiter',
-                        'saturn', 'uranus', 'neptune']
+                        'saturn', 'uranus', 'neptune', 'moon']
 
         # position, velocity, mass*G, radius
         p = {'sun': 0, 'mercury': 57.909e6, 'venus': 108.210e6, 'earth': 149.598e6, 'mars': 227.956e6,
-             'jupiter': 778412010, 'saturn': 1426725400, 'uranus': 2870972200, 'neptune': 4498252900}
+             'jupiter': 778412010, 'saturn': 1426725400, 'uranus': 2870972200, 'neptune': 4498252900,
+             'moon': 149.598e6+0.3633e6}
         v = {'sun': 0, 'mercury': 47.36, 'venus': 35.02, 'earth': 29.78, 'mars': 24.07, 'jupiter': 13.0697,
-             'saturn': 9.6724, 'uranus': 6.8352, 'neptune': 5.4778}
+             'saturn': 9.6724, 'uranus': 6.8352, 'neptune': 5.4778, 'moon': 29.78}
         # m = [132712e6, 126.687e6, 37.931e6, 5.7940e6, 6.8351e6]
         m = {'sun': 1.32712440017987e11, 'mercury': 2.203208e4, 'venus': 3.24858599e5, 'earth': 3.98600433e5,
              'mars': 4.2828314e4, 'jupiter': 1.26712767863e8, 'saturn': 3.79406260630e7, 'uranus': 5.79454900700e6,
-             'neptune': 6.83653406400e6}
+             'neptune': 6.83653406400e6, 'moon': 0.0049e6}
         r = {'sun': 6.955e5, 'mercury': 2439.7, 'venus': 6051.8, 'earth': 6371.01, 'mars': 3389.9, 'jupiter': 69911,
-             'saturn': 58232, 'uranus': 25362, 'neptune': 24624}
+             'saturn': 58232, 'uranus': 25362, 'neptune': 24624, 'moon': 1737}
 
         # rotation vector, J2 parameter
         s = {}
@@ -249,4 +251,4 @@ if __name__ == '__main__':
     # read_from_INPOP('PCB', '2000-01-01T12:00:00')
 
     day = '2050-01-01T12:00:00'
-    print(f'mars, day = {day} {ss.getPlanet("mars", day)}')
+    print(f'moon, day = {day} {ss.getPlanet("moon", day)}')

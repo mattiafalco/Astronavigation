@@ -1,6 +1,29 @@
 import numpy as np
 
 
+def cartesian(ra, dec):
+    """
+    This function evaluates the cartesian coordinates from the values of right ascension and declination
+    expressed in degree.
+
+    Parameters
+    ----------
+    ra : float
+        right ascension (in degree)
+    dec : float
+        declination (in degree)
+
+    Returns
+    -------
+    np.ndarray
+        cartesian coordinates
+    """
+    alpha = np.deg2rad(ra)
+    delta = np.deg2rad(dec)
+
+    return np.array([np.cos(alpha) * np.cos(delta), np.sin(alpha) * np.cos(delta), np.sin(delta)])
+
+
 def deflection(l0: np.ndarray, x: np.ndarray, x_a: np.ndarray, x_obs: np.ndarray, eps: float, v: np.ndarray, M: float,
                s: np.ndarray = np.array([0, 0, 0]), J2: float = 0, R: float = 0) -> np.ndarray:
     """
