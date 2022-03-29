@@ -122,6 +122,7 @@ def quadru(pl: str):
 
     """
     Evaluate the rotation vector and the J2 parameter of a given body of the Solar System.
+    Data are taken from the NASA fact sheets (https://nssdc.gsfc.nasa.gov/planetary)
 
     Parameters
     ----------
@@ -148,6 +149,18 @@ def quadru(pl: str):
         alpha = np.deg2rad(40.589)
         delta = np.deg2rad(83.537)
         J2 = 16298e-6
+    elif pl == 'earth':
+        alpha = np.deg2rad(0.0)
+        delta = np.deg2rad(90.0)
+        J2 = 1082.63e-6
+    elif pl == 'uranus':
+        alpha = np.deg2rad(257.311)
+        delta = np.deg2rad(-15.175)
+        J2 = 3343.43e-6
+    elif pl == 'neptune':
+        alpha = np.deg2rad(299.36 + 0.70*np.sin(np.deg2rad(357.85)))
+        delta = np.deg2rad(43.46 - 0.51*np.cos(np.deg2rad(357.85)))
+        J2 = 3411e-6
     else:
         pass
 

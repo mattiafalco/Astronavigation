@@ -69,7 +69,7 @@ for x in x_stars:
     print(f'pointing errors - sun: {(dr-dr[0])/AU} AU')
 
     # quadrupole jupiter-saturn
-    list_q = ['jupiter', 'saturn']
+    list_q = ['jupiter', 'saturn', 'uranus', 'neptune']
     planets_q = [ss.getPlanet(pl) for pl in list_q]
 
     dlq = []
