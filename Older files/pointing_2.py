@@ -1,7 +1,5 @@
-import numpy as np
 from deflection import *
-from astropy import constants
-from planets import Body, SolarSystem
+from planets import SolarSystem
 
 # pc = constants.pc.to('km').value
 #AU = constants.au.to('km').value
