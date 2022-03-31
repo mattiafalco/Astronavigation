@@ -28,7 +28,7 @@ def read_from_INPOP(pl, date):
     -------
     pos : np.ndarray
         position
-    vel : np.nd.array
+    vel : np.ndarray
         velocity
     """
 
@@ -65,13 +65,13 @@ class Body(object):
     ----------
     mass : float
         body mass*G (in km3/s2)
-    pos : 3-array
+    pos : np.ndarray
         body position (in km)
-    vel : 3-array
+    vel : np.ndarray
         body velocity (in km/s)
     radius : float
         body radius (in km)
-    s : 3-array
+    s : np.ndarray
         rotation vector
     J2 : float
         body J2 parameter
@@ -100,6 +100,7 @@ class Body(object):
         self.radius = radius
         self.s = s
         self.J2 = J2
+        self.dist = np.linalg.norm(pos)
 
     def __str__(self):
         str = f'\nmass*G: {self.mass} km3/s2 \npos: {self.pos} km' \

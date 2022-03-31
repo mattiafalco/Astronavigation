@@ -1,6 +1,6 @@
 """ This script generates a clean dataset from the NASA exoplanet archive
 that can be found at http://exoplanetarchive.ipac.caltech.edu
-This file can also be used as a template to write a code for data reading
+This file can also be used as a template to write a code for data reading.
 Creator: Mattia Falco
 Date: 27/03/2022
 """
@@ -17,6 +17,8 @@ data_clean = data.loc[pd.notna(data['sy_dist'])]
 # data_clean = data_clean.set_index('pl_name')
 data_clean = data_clean.drop_duplicates(subset=['pl_name'])
 
+data_clean = data_clean.set_index('pl_name')
+
 # filt = data_clean['hostname']=='Proxima Cen'
 # print(data_clean.loc[filt])
 
@@ -26,4 +28,4 @@ data_clean = data_clean.drop_duplicates(subset=['pl_name'])
 # print(nump)
 
 if __name__ == "__main__":
-    data_clean.to_csv('exo_archive.csv', sep=',', index=False)
+    data_clean.to_csv('exo_archive.csv', sep=',', index=True)

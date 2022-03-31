@@ -94,8 +94,8 @@ def quadru(pl: str):
 #########################
 
 
-def deflection(l0: np.ndarray, x: np.ndarray, x_a: np.ndarray, x_obs: np.ndarray, eps: float, v: np.ndarray, M: float,
-               s: np.ndarray = np.array([0, 0, 0]), J2: float = 0, R: float = 0) -> np.ndarray:
+def deflection(l0, x: np.ndarray, x_a, x_obs, eps, v, M,
+               s = np.array([0, 0, 0]), J2 = 0, R = 0):
     """
     Evaluate  the difference between the unperturbed direction l0 and the perturbed direction. If one of the last three
     parameters is set to its default value it evaluates the monopole contribution whereas it evaluates only the
@@ -282,9 +282,7 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
 
 def dx(l_obs, l0, x, x_a, x_obs, eps, v, M):
     """
-    Evaluate  the difference between the unperturbed direction l0 and the perturbed direction. If one of the last three
-    parameters is set to its default value it evaluates the monopole contribution whereas it evaluates only the
-    quadrupole contribution.
+    Evaluate  the difference between the unperturbed position x0 and the perturbed position.
 
     Parameters
     ----------
@@ -307,7 +305,7 @@ def dx(l_obs, l0, x, x_a, x_obs, eps, v, M):
 
     Returns
     -------
-    3-array
+    np.ndarray
         perturbation on the direction of observation
     """
 

@@ -2,12 +2,18 @@ import numpy as np
 from deflection import *
 from astropy import constants
 from planets import Body, SolarSystem
+import pandas as pd
+from read_exo import getExo
 
 # Define constants
 pc = constants.pc.to('km').value
 AU = constants.au.to('km').value
 c = constants.c.to('km/s').value
 eps = 1/c
+
+# read exo catalogue
+path = 'exo_archive.csv'
+data = pd.read_csv(path)
 
 ######################################
 #
@@ -20,7 +26,9 @@ g = -np.pi/2
 # masses
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # targets
-dist = np.array([1.3012, 188, 2300])*pc
+targets = ['Proxima Cen b', 'K2-100 b', 'Kepler-943 b']
+dist = np.array([getExo(pl, data).dist for pl in targets])
+# dist = np.array([1.3012, 188, 2300])*pc
 
 #################
 #

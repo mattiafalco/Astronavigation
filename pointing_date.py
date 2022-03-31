@@ -2,12 +2,18 @@ import numpy as np
 from deflection import *
 from astropy import constants
 from planets import Body, SolarSystem
+import pandas as pd
+from read_exo import getExo
 
 # Define constants
 pc = constants.pc.to('km').value
 AU = constants.au.to('km').value
 c = constants.c.to('km/s').value
 eps = 1/c
+
+# read exo catalogue
+path = 'exo_archive.csv'
+catalogue = pd.read_csv(path)
 
 ######################################
 #
@@ -20,9 +26,10 @@ obs = 'earth'
 # masses
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # target
-dist = 1.3012*pc  # Proxima Cen b
-ra = 217.3934657  # deg
-dec = -62.6761821  # deg
+# dist = 1.3012*pc  # Proxima Cen b
+# ra = 217.3934657  # deg
+# dec = -62.6761821  # deg
+target = 'Proxima Cen b'
 # date
 date = '1996-02-25T12:00:00'
 
@@ -39,7 +46,8 @@ ss = SolarSystem(ephemerides=True)
 x_obs = ss.getPlanet(obs, date=date).pos
 
 # target
-x = dist*cartesian(ra, dec)
+# x = dist*cartesian(ra, dec)
+x = getExo(target, catalogue).pos
 l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
 
 # take bodies which generate grav. field
@@ -84,12 +92,13 @@ dpsi_tot = np.cumsum(dpsi)
 #
 #################
 print(f'dl: {np.rad2deg(dlt)*3600*1e6} muas')
-print(f'dl - sun: {np.rad2deg(dlt-dlt[0])*3600*1e6} muas')
+print(f'dl - sun: {np.rad2deg(dlt-dlt[0])*3600*1e6} muas\n')
 
 # point error
 dr = np.linalg.norm(x-x_obs)*dlt
 print(f'pointing errors: {dr/AU} AU')
-print(f'pointing errors - sun: {(dr-dr[0])/AU} AU')
+print(f'pointing errors - sun: {(dr-dr[0])/AU} AU\n')
 
 # quadrupole
 print(f'dl quadrupole: {np.rad2deg(dl1_q)*3600*1e6} muas')
+print(f'dr quadrupole: {np.linalg.norm(x-x_obs)*dl1_q/AU} AU')
