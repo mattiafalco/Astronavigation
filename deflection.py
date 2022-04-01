@@ -37,7 +37,7 @@ def cartesian(ra, dec):
     return np.array([np.cos(alpha) * np.cos(delta), np.sin(alpha) * np.cos(delta), np.sin(delta)])
 
 
-def quadru(pl: str):
+def quadru(pl):
 
     """
     Evaluate the rotation vector and the J2 parameter of a given body of the Solar System.
@@ -191,7 +191,7 @@ def deflection(l0, x: np.ndarray, x_a, x_obs, eps, v, M,
 def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
     """
     Evaluate  the difference between the unperturbed direction l0 and the perturbed direction with
-    a given impact parameter. One should use this function for tests onl. If one of the last three
+    a given impact parameter. One should use this function for tests only. If one of the last three
     parameters is set to its default value it evaluates the monopole contribution whereas it evaluates
     only the quadrupole contribution.
 
@@ -245,7 +245,7 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
     # evaluate parameters
     sigma = np.dot(x-x_obs, l0)
     d = r_obs - l0*r_obs_norm*np.cos(chi)
-    d2 = r_obs_norm**2*np.sin(chi)**2
+    d2 = r_obs_norm**2 * np.sin(chi)**2
     dv = np.cross(l0, np.cross(v, l0))
 
     if debug: print(f'd = {np.sqrt(d2)} km')

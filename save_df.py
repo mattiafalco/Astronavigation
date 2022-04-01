@@ -26,7 +26,7 @@ def save_df(data, columns, index, path):
     data_saved = pd.DataFrame(np.array(data).T,
                               columns=columns,
                               index=index)
-    data_saved.to_csv(path, sep=',')
+    data_saved.to_csv(f'{path}.csv', sep=',')
 
 
 def read_df(path):

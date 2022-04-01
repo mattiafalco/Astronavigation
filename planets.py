@@ -215,7 +215,7 @@ class SolarSystem(object):
         Returns
         -------
         Sun : Body
-            required body object in the given position
+            Sun in the given position
         """
 
         return self.getPlanet('sun', date=date)

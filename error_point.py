@@ -17,7 +17,7 @@ path = 'exo_archive.csv'
 data = pd.read_csv(path)
 
 # save parameter
-save = True
+save = False
 
 ######################################
 #
@@ -49,26 +49,21 @@ x_obs = AU*np.array([np.cos(g), np.sin(g), 0])
 # take bodies which generate grav. field
 planets = [ss.getPlanet(pl) for pl in list_p]
 
-# planets data
-x_p = [planet.pos for planet in planets]
-v_p = [planet.vel for planet in planets]
-m_p = [planet.mass for planet in planets]
-r_p = [planet.radius for planet in planets]
-# evaluate impact angles
-chi_p = [r_p[i]/np.linalg.norm(x_obs - x_p[i]) for i in range(len(planets))]
-print(f'chi: {chi_p}')
-
 # targets
 x_stars = [np.array([0, d, 0]) for d in dist]
-l0 = [-np.array([np.sin(chi), np.cos(chi), 0]) for chi in chi_p]
 
 # external loop on the targets
-dl1 = np.zeros(len(x_p))
 for x in x_stars:
     # internal loop on the masses, evaluate deflections
-    for i in range(len(x_p)):
-        dls = deflection_mod(l0[i], x, x_p[i], x_obs, eps, v_p[i], m_p[i], chi_p[i])
-        dl1[i] = np.linalg.norm(dls)
+    dl1 = []
+    for pl in planets:
+        # impact angle
+        chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
+        # direction
+        l0 = -np.array([np.sin(chi), np.cos(chi), 0])
+        # deflection
+        dls = deflection_mod(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass, chi)
+        dl1.append(np.linalg.norm(dls))
 
     dlt = np.cumsum(dl1)
 
@@ -98,11 +93,14 @@ for x in x_stars:
 
     dl_q = []
     # internal loop on the masses, evaluate quadrupole deflections
-    for i in range(len(planets_q)):
-        chi = planets_q[i].radius/np.linalg.norm(x_obs-planets_q[i].pos)
+    for pl in planets_q:
+        # impact angle
+        chi = pl.radius/np.linalg.norm(x_obs-pl.pos)
+        # direction
         l0q = -np.array([np.sin(chi), np.cos(chi), 0])
-        dls = deflection_mod(l0q, x, planets_q[i].pos, x_obs, eps, planets_q[i].vel, planets_q[i].mass, chi,
-                             planets_q[i].s, planets_q[i].J2, planets_q[i].radius)
+        # deflection
+        dls = deflection_mod(l0q, x, pl.pos, x_obs, eps, pl.vel, pl.mass, chi,
+                             pl.s, pl.J2, pl.radius)
         dl_q.append(np.linalg.norm(dls))
     dlt_q = np.cumsum(np.array(dl_q))
     dr_q = np.linalg.norm(x-x_obs)*dlt_q
