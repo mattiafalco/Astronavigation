@@ -4,6 +4,7 @@ from astropy import constants
 from planets import Body, SolarSystem
 import pandas as pd
 from read_exo import getExo
+from save_df import save_df
 
 # Define constants
 pc = constants.pc.to('km').value
@@ -14,6 +15,9 @@ eps = 1/c
 # read exo catalogue
 path = 'exo_archive.csv'
 data = pd.read_csv(path)
+
+# save parameter
+save = True
 
 ######################################
 #
@@ -76,19 +80,40 @@ for x in x_stars:
     print(f'pointing errors: {dr/AU} AU')
     print(f'pointing errors - sun: {(dr-dr[0])/AU} AU')
 
+    # saving
+    if save:
+        rows = list_p
+        columns = ['dl', 'dlt', 'dlt - sun', 'dr', 'dr - sun']
+        data = [np.rad2deg(dl1)*3600*1e6,
+                np.rad2deg(dlt)*3600*1e6,
+                np.rad2deg(dlt-dlt[0])*3600*1e6,
+                dr/AU,
+                (dr-dr[0])/AU]
+        path = f'Data/max_errors_{np.round(np.linalg.norm(x) / pc, 4)}_pc'
+        save_df(data, columns, rows, path)
+
     # quadrupole jupiter-saturn
     list_q = ['jupiter', 'saturn', 'uranus', 'neptune']
     planets_q = [ss.getPlanet(pl) for pl in list_q]
 
-    dlq = []
+    dl_q = []
     # internal loop on the masses, evaluate quadrupole deflections
     for i in range(len(planets_q)):
         chi = planets_q[i].radius/np.linalg.norm(x_obs-planets_q[i].pos)
         l0q = -np.array([np.sin(chi), np.cos(chi), 0])
         dls = deflection_mod(l0q, x, planets_q[i].pos, x_obs, eps, planets_q[i].vel, planets_q[i].mass, chi,
                              planets_q[i].s, planets_q[i].J2, planets_q[i].radius)
-        dlq.append(np.linalg.norm(dls))
-    dlq = np.cumsum(np.array(dlq))
-    drq = np.linalg.norm(x-x_obs)*dlq
-    print(f'quadrupole jup-sat: {drq/AU} AU')
+        dl_q.append(np.linalg.norm(dls))
+    dlt_q = np.cumsum(np.array(dl_q))
+    dr_q = np.linalg.norm(x-x_obs)*dlt_q
+    print(f'quadrupole jup-sat: {dr_q/AU} AU')
 
+    # saving
+    if save:
+        rows = list_q
+        columns = ['dl', 'dlt', 'dr']
+        data = [np.rad2deg(dl_q) * 3600 * 1e6,
+                np.rad2deg(dlt_q) * 3600 * 1e6,
+                dr_q / AU]
+        path = f'Data/max_errors_quad_{np.round(np.linalg.norm(x) / pc, 4)}_pc'
+        save_df(data, columns, rows, path)

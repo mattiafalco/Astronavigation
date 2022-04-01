@@ -4,6 +4,7 @@ from astropy import constants
 from planets import Body, SolarSystem
 import pandas as pd
 from read_exo import getExo
+from save_df import save_df
 
 # Define constants
 pc = constants.pc.to('km').value
@@ -14,6 +15,9 @@ eps = 1/c
 # read exo catalogue
 path = 'exo_archive.csv'
 catalogue = pd.read_csv(path)
+
+# save parameter
+save = False
 
 ######################################
 #
@@ -102,3 +106,23 @@ print(f'pointing errors - sun: {(dr-dr[0])/AU} AU\n')
 # quadrupole
 print(f'dl quadrupole: {np.rad2deg(dl1_q)*3600*1e6} muas')
 print(f'dr quadrupole: {np.linalg.norm(x-x_obs)*dl1_q/AU} AU')
+
+#################
+#
+# Saving
+#
+#################
+
+if save:
+    columns = ['dl', 'dl - sun', 'dr', 'dr - sun']
+    index = list_p
+    path = f'Data/pointing_errors_{date}'
+    save_df([np.rad2deg(dlt)*3600*1e6,
+             np.rad2deg(dlt-dlt[0])*3600*1e6,
+             dr/AU,
+             (dr-dr[0])/AU],
+            columns=columns,
+            index=index,
+            path=path)
+
+
