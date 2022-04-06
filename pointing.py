@@ -16,7 +16,7 @@ eps = 1/c
 ######################################
 
 # angle of observation
-g = -np.pi/2 + 6.955e5/AU  # constants.R_sun.to('km').value/AU
+g = 0 #-np.pi/2 + 6.955e5/AU  # constants.R_sun.to('km').value/AU
 # masses
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # masses for quadrupole contribution
@@ -48,6 +48,7 @@ dl1 = []
 dpsi = []
 for pl in planets:
     dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
+    # dls = deflection(l0, x, pl.pos, x_obs, eps, np.array([0,0,0]), pl.mass)
     dl1.append(np.linalg.norm(dls))
     dln = dls - l0*np.dot(dls, l0)
     dpsi.append(np.linalg.norm(dln))

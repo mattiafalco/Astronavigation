@@ -148,10 +148,16 @@ def deflection(l0, x: np.ndarray, x_a, x_obs, eps, v, M,
     # evaluate parameters
     sigma = np.dot(x-x_obs, l0)
     d = r_obs - l0*np.dot(r_obs, l0)
-    d2 = r_obs_norm**2 - (np.dot(r_obs, l0))**2
+    # d2 = r_obs_norm**2 - (np.dot(r_obs, l0))**2
+    d2 = np.linalg.norm(d)**2
     dv = np.cross(l0, np.cross(v, l0))
 
-    if debug: print(f'd = {np.sqrt(d2)} km')
+    if debug:
+        print(f'r_obs: {r_obs} km\n'
+              f'r_obs_norm: {r_obs_norm} km\n'
+              f'r_obs*l0: {np.dot(r_obs, l0)} \n'
+              f'd: {d}')
+        print(f'd = {np.sqrt(d2)} km')
 
     if np.all(s == 0) and J2 == 0 and R == 0:
 
@@ -253,11 +259,11 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
     if np.all(s == 0) and J2 == 0 and R == 0:
 
         # evaluate useful combinations
-        p1 = 1/r_norm - 1/r_obs_norm
-        p2 = l0 - 2*eps*(2*dv - d*np.dot(v, r_obs)/d2)
-        p3 = 2*d*((1-2*eps*np.dot(v, l0))*(np.dot(n, l0) - np.dot(n_obs, l0)))/d2
-        p4 = r_obs_norm*(dv - 2*d*np.dot(v, d)/d2)/(d2*r_norm)
-        p5 = r_norm - r_obs_norm - np.dot(n_obs, l0)*sigma
+        p1 = 1 / r_norm - 1 / r_obs_norm
+        p2 = l0 - 2 * eps * (2 * dv - d * np.dot(v, r_obs) / d2)
+        p3 = 2 * d * ((1 - 2 * eps * np.dot(v, l0)) * (np.dot(n, l0) - np.dot(n_obs, l0))) / d2
+        p4 = r_obs_norm * (dv - 2 * d * np.dot(v, d) / d2) / (d2 * r_norm)
+        p5 = r_norm - r_obs_norm - np.dot(n_obs, l0) * sigma
 
         if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
 
@@ -282,7 +288,7 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
 
 def dx(l_obs, l0, x, x_a, x_obs, eps, v, M):
     """
-    Evaluate  the difference between the unperturbed position x0 and the perturbed position.
+    Evaluate  the difference between the unperturbed position of a source and the perturbed position.
 
     Parameters
     ----------
@@ -372,7 +378,7 @@ if __name__ == "__main__":
     print('\n--------------- test -------------\nmonopole deflection at chi = 90 deg')
     dls = deflection(l0, x, x_a, x_obs, eps, v, MG)
     # print(dls)
-    print(f'dl_n mono = {np.rad2deg(((np.linalg.norm(dls)))) * 3600 * 1e6} muas')
+    print(f'dl_n mono = {np.rad2deg((np.linalg.norm(dls))) * 3600 * 1e6} muas')
 
     # print('\n--------------- test -------------\nquadrupole deflection at chi = 22 as')
     #

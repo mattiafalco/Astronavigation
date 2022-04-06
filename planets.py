@@ -101,6 +101,7 @@ class Body(object):
         self.s = s
         self.J2 = J2
         self.dist = np.linalg.norm(pos)
+        self.speed = np.linalg.norm(vel)
 
     def __str__(self):
         str = f'\nmass*G: {self.mass} km3/s2 \npos: {self.pos} km' \

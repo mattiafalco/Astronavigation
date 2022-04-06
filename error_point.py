@@ -48,6 +48,7 @@ x_obs = AU*np.array([np.cos(g), np.sin(g), 0])
 
 # take bodies which generate grav. field
 planets = [ss.getPlanet(pl) for pl in list_p]
+v_null = np.array([0, 0, 0])
 
 # targets
 x_stars = [np.array([0, d, 0]) for d in dist]
@@ -56,6 +57,7 @@ x_stars = [np.array([0, d, 0]) for d in dist]
 for x in x_stars:
     # internal loop on the masses, evaluate deflections
     dl1 = []
+    dl2 = []  # w/ null velocities
     for pl in planets:
         # impact angle
         chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
@@ -64,8 +66,12 @@ for x in x_stars:
         # deflection
         dls = deflection_mod(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass, chi)
         dl1.append(np.linalg.norm(dls))
+        # deflection w/ null velocities
+        dls = deflection_mod(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, chi)
+        dl2.append(np.linalg.norm(dls))
 
     dlt = np.cumsum(dl1)
+    dlt_vn = np.cumsum(dl2)
 
     # point error
     dr = np.linalg.norm(x-x_obs)*dlt
@@ -78,8 +84,9 @@ for x in x_stars:
     # saving
     if save:
         rows = list_p
-        columns = ['dl', 'dlt', 'dlt - sun', 'dr', 'dr - sun']
-        data = [np.rad2deg(dl1)*3600*1e6,
+        columns = ['dl_vn', 'dl', 'dlt', 'dlt - sun', 'dr', 'dr - sun']
+        data = [np.rad2deg(dl2)*3600*1e6,
+                np.rad2deg(dl1)*3600*1e6,
                 np.rad2deg(dlt)*3600*1e6,
                 np.rad2deg(dlt-dlt[0])*3600*1e6,
                 dr/AU,
@@ -115,3 +122,6 @@ for x in x_stars:
                 dr_q / AU]
         path = f'Data/max_errors_quad_{np.round(np.linalg.norm(x) / pc, 4)}_pc'
         save_df(data, columns, rows, path)
+
+
+print(np.rad2deg(4*ss.getPlanet('jupiter').mass/c**2/ss.getPlanet('jupiter').radius)*3600*1e6)
