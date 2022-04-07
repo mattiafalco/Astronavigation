@@ -17,7 +17,7 @@ path = 'exo_archive.csv'
 data = pd.read_csv(path)
 
 # save parameter
-save = False
+save = True
 
 ######################################
 #
@@ -28,7 +28,7 @@ save = False
 # angle of observation
 g = -np.pi/2
 # masses
-list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
+list_p = ['sun', 'earth', 'jupiter', 'saturn', 'uranus', 'neptune']
 # targets
 targets = ['Proxima Cen b', 'K2-100 b', 'Kepler-943 b']
 dist = np.array([getExo(pl, data).dist for pl in targets])
@@ -44,10 +44,20 @@ dist = np.array([getExo(pl, data).dist for pl in targets])
 ss = SolarSystem()
 
 # observer
-x_obs = AU*np.array([np.cos(g), np.sin(g), 0])
+x_obs = (AU+380000)*np.array([np.cos(g), np.sin(g), 0])
 
 # take bodies which generate grav. field
-planets = [ss.getPlanet(pl) for pl in list_p]
+# planets = [ss.getPlanet(pl) for pl in list_p]
+planets = []
+for pl in list_p:
+
+    if pl != 'earth':
+        anom = np.pi/2
+    else:
+        anom = -np.pi/2
+
+    planets.append(ss.getPlanet(pl, anom=anom))
+
 v_null = np.array([0, 0, 0])
 
 # targets

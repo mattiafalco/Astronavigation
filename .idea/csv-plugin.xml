@@ -45,6 +45,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/PS_2022.03.28_05.32.23.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/exo_archive.csv">
           <value>
             <Attribute>
