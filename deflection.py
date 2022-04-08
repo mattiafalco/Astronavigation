@@ -182,12 +182,28 @@ def deflection(l0, x: np.ndarray, x_a, x_obs, eps, v, M,
         t = l0
         m = np.cross(t, n)
 
+        # # evaluate useful combinations
+        # p2 = (((J2*R**2)/d2) * (1 - np.dot(s, t)**2 - 2*np.dot(s, n)**2))*n
+        # p3 = (((J2*R**2)/d2)*np.dot(s, m)*np.dot(s, n))*m
+        #
+        # # evaluate deflection
+        # dl = ((4*M*eps**2)/np.sqrt(d2))*(p2 + p3)
+
+        # evaluate chi
+        chi = np.arccos(np.dot(x - x_obs, x_a - x_obs) / (np.linalg.norm(x - x_obs) * np.linalg.norm(x_a - x_obs)))
+
         # evaluate useful combinations
-        p2 = (((J2*R**2)/d2) * (1 - np.dot(s, t)**2 - 2*np.dot(s, n)**2))*n
-        p3 = (((J2*R**2)/d2)*np.dot(s, m)*np.dot(s, n))*m
+        p1 = 1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+        p2 = -2 * (1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+                   + 3 / 4 * np.cos(chi) * np.sin(chi) ** 4) * np.dot(n, s) ** 2
+        p3 = (np.sin(chi) ** 3 - 3 * np.sin(chi) ** 5) * np.dot(n, s) * np.dot(t, s)
+        p4 = -(1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+               - 3 / 2 * np.cos(chi) * np.sin(chi) ** 4) * np.dot(t, s) ** 2
+        p5 = 2 * (1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2) * np.dot(n, s) * np.dot(m, s)
+        p6 = np.sin(chi) ** 3 * np.dot(m, s) * np.dot(t, s)
 
         # evaluate deflection
-        dl = ((4*M*eps**2)/np.sqrt(d2))*(p2 + p3)
+        dl = (2 * M * eps ** 2 / np.sqrt(d2)) * (J2 * R ** 2 / d2) * ((p1 + p2 + p3 + p4) * n + (p5 + p6) * m)
 
         if debug: print(f'd = {np.sqrt(d2)}')
 
@@ -274,12 +290,33 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
 
         return dl
     else:
-        n = -d/np.linalg.norm(d)
+        # define three ON vectors
+        n = -d / np.linalg.norm(d)
         t = l0
         m = np.cross(t, n)
-        p2 = (((J2*R**2)/d2) * (1 - np.dot(s, t)**2 - 2*np.dot(s, n)**2))*n
-        p3 = (((J2*R**2)/d2)*np.dot(s, m)*np.dot(s, n))*m
-        dl = ((4*M*eps**2)/np.sqrt(d2))*(p2 + p3)
+
+        # # evaluate useful combinations
+        # p2 = (((J2*R**2)/d2) * (1 - np.dot(s, t)**2 - 2*np.dot(s, n)**2))*n
+        # p3 = (((J2*R**2)/d2)*np.dot(s, m)*np.dot(s, n))*m
+        #
+        # # evaluate deflection
+        # dl = ((4*M*eps**2)/np.sqrt(d2))*(p2 + p3)
+
+        # evaluate chi
+        # chi_n = np.arccos(np.dot(x - x_obs, x_a - x_obs) / (np.linalg.norm(x - x_obs) * np.linalg.norm(x_a - x_obs)))
+
+        # evaluate useful combinations
+        p1 = 1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+        p2 = -2 * (1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+                   + 3 / 4 * np.cos(chi) * np.sin(chi) ** 4) * np.dot(n, s) ** 2
+        p3 = (np.sin(chi) ** 3 - 3 * np.sin(chi) ** 5) * np.dot(n, s) * np.dot(t, s)
+        p4 = -(1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+               - 3 / 2 * np.cos(chi) * np.sin(chi) ** 4) * np.dot(t, s) ** 2
+        p5 = 2 * (1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2) * np.dot(n, s) * np.dot(m, s)
+        p6 = np.sin(chi) ** 3 * np.dot(m, s) * np.dot(t, s)
+
+        # evaluate deflection
+        dl = (2 * M * eps ** 2 / np.sqrt(d2)) * (J2 * R ** 2 / d2) * ((p1 + p2 + p3 + p4) * n + (p5 + p6) * m)
 
         if debug: print(f'd = {np.sqrt(d2)}')
 

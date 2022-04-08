@@ -17,7 +17,7 @@ path = 'exo_archive.csv'
 data = pd.read_csv(path)
 
 # save parameter
-save = True
+save = False
 
 ######################################
 #
@@ -121,6 +121,7 @@ for x in x_stars:
         dl_q.append(np.linalg.norm(dls))
     dlt_q = np.cumsum(np.array(dl_q))
     dr_q = np.linalg.norm(x-x_obs)*dlt_q
+    print(f'angle errors quad: {np.rad2deg(dlt_q) * 3600 * 1e6} muas')
     print(f'quadrupole jup-sat: {dr_q/AU} AU')
 
     # saving

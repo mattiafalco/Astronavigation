@@ -16,7 +16,7 @@ eps = 1/c
 ######################################
 
 # angle of observation
-g = 0 #-np.pi/2 + 6.955e5/AU  # constants.R_sun.to('km').value/AU
+g = -np.pi/2 + 6.955e5/AU  # constants.R_sun.to('km').value/AU
 # masses
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # masses for quadrupole contribution
