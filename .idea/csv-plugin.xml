@@ -45,6 +45,62 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/pointing_errors_KMT-2016-BLG-2605L b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_Kepler-220 b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_Kepler-288 b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_Kepler-847 b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_OGLE-2008-BLG-092L b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_OGLE-2014-BLG-0124L b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_OGLE-2015-BLG-0966L b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_Proxima Cen b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/PS_2022.03.28_05.32.23.csv">
           <value>
             <Attribute>
@@ -53,6 +109,13 @@
           </value>
         </entry>
         <entry key="/exo_archive.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/test_tab.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
