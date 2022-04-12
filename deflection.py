@@ -94,7 +94,7 @@ def quadru(pl):
 #########################
 
 
-def deflection(l0, x: np.ndarray, x_a, x_obs, eps, v, M,
+def deflection(l0, x, x_a, x_obs, eps, v, M,
                s = np.array([0, 0, 0]), J2 = 0, R = 0):
     """
     Evaluate  the difference between the unperturbed direction l0 and the perturbed direction. If one of the last three
@@ -392,6 +392,62 @@ def dx(l_obs, l0, x, x_a, x_obs, eps, v, M):
     if debug: print(f'dl: {deltax}')
 
     return deltax
+
+
+def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R):
+    """
+
+    Parameters
+    ----------
+    l0 : np.ndarray
+        unperturbed direction
+    x : np.ndarray
+        source position (in km)
+    x_a : np.ndarray
+        mass position (in km)
+    x_obs : np.ndarray
+        observer position (in km)
+    eps : float
+        small parameter, usually 1/c (in s/km)
+    M : float
+        mass parameter m*G (in km3/s2)
+    J2 : float
+        oblateness parameter
+    R : float
+        mass radius (in km)
+
+    Returns
+    -------
+    dl : np.ndarray
+        perturbation on the direction of observation
+    """
+    # debug parameter, if true print some information
+    debug = False
+
+    # evaluate distance mass-source
+    r = x - x_a
+    # evaluate distance mass-observer
+    r_obs = x_obs - x_a
+
+    # evaluate vector norm
+    r_norm = np.linalg.norm(r)
+    r_obs_norm = np.linalg.norm(r_obs)
+
+    # evaluate parameters
+    d = r_obs - l0 * np.dot(r_obs, l0)
+    d2 = np.linalg.norm(d)**2
+
+    # evaluate contributions
+    p1 = 4 * M / np.sqrt(d)
+    p2 = (15 * np.pi * M**2) / (4 * d2)
+    p3 = (4 * J2 * R**2 * M) / (np.sqrt(d)**3)
+    p4 = (128 * M**3) / (3 * np.sqrt(d)**3)
+
+    # evaluate deflection
+    dl = eps**2 * p1 + eps**4 * p2 + eps**2 * p3 + eps**6 * p4
+
+    return dl
+
 
 
 if __name__ == "__main__":

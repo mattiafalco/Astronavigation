@@ -39,7 +39,13 @@ targets = ['Proxima Cen b', 'Kepler-220 b', 'Kepler-847 b', 'Kepler-288 b', 'OGL
 date_ref = np.datetime64('2122-01-01T12:00:00')
 month = 200  # set 0 to have only one date
 
-# create 200 days
+#################
+#
+# Algorithm
+#
+#################
+
+# create dates
 day = np.timedelta64(30, 'D')
 dates = [date_ref]
 for i in range(month):
@@ -49,12 +55,6 @@ dates = np.datetime_as_string(dates)
 # no dot save multiple days
 if len(dates) > 1:
     save = False
-
-#################
-#
-# Algorithm
-#
-#################
 
 # list in which save data
 dr_date = []
