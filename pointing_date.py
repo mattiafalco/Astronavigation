@@ -37,7 +37,7 @@ targets = ['Proxima Cen b', 'Kepler-220 b', 'Kepler-847 b', 'Kepler-288 b', 'OGL
            'GJ 1252 b', 'HR 858 c', 'WASP-84 b', 'K2-80 b', 'HAT-P-46 b']
 # date
 date_ref = np.datetime64('2122-01-01T12:00:00')
-month = 200  # set 0 to have only one date
+month = 0  # set 0 to have only one date
 
 #################
 #
@@ -181,18 +181,19 @@ for date in dates:
     #
     #################
 
-    # fig = plt.figure()
-    # ax = plt.axes(projection='3d')
-    # ax.plot(x_obs[0] / AU, x_obs[1] / AU, x_obs[2] / AU, label=obs, marker='x')
-    # for i, pl in enumerate(planets):
-    #     x_p = pl.pos
-    #     ax.plot(x_p[0] / AU, x_p[1] / AU, x_p[2] / AU, label=list_p[i], marker='.')
-    # for target in targets:
-    #     x = getExo(target, catalogue).pos
-    #     l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
-    #     ax.plot(l0[0] * 50, l0[1] * 50, l0[2] * 50, label=target, marker='*')
-    # plt.legend(loc=(1.05, 0.3), fontsize='xx-small')
-    # plt.show()
+    if len(dates) == 1:
+        fig = plt.figure()
+        ax = plt.axes(projection='3d')
+        ax.plot(x_obs[0] / AU, x_obs[1] / AU, x_obs[2] / AU, label=obs, marker='x')
+        for i, pl in enumerate(planets):
+            x_p = pl.pos
+            ax.plot(x_p[0] / AU, x_p[1] / AU, x_p[2] / AU, label=list_p[i], marker='.')
+        for target in targets:
+            x = getExo(target, catalogue).pos
+            l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
+            ax.plot(l0[0] * 50, l0[1] * 50, l0[2] * 50, label=target, marker='*')
+        plt.legend(loc=(1.05, 0.3), fontsize='xx-small')
+        plt.show()
 
 dr_date = np.array(dr_date).T
 dr_nosun_date = np.array(dr_nosun_date).T

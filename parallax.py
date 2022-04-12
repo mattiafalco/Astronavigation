@@ -26,7 +26,7 @@ eps = 1/c
 # black hole
 bh = Body(mass=7.1*GM_sun,
           pos=np.array([-4, -1580, -45])*pc,
-          vel=np.array([3, 0, 40]))
+          vel=np.array([0, 0, 0]))#np.array([3, 0, 40]))
 
 # observer
 obs = 'earth'
@@ -67,6 +67,8 @@ for pl in list_p:
 dl_dict['tot'] = []
 
 for t in t_span:
+
+    # bh.pos = bh.pos + t*24*3600*bh.vel
 
     # observer
     anom = ss.getPlanet(obs).speed / ss.getPlanet(obs).dist * t * 24 * 3600
