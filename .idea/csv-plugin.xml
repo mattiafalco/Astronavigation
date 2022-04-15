@@ -59,6 +59,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/pointing_errors_HR 858 c_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/pointing_errors_KMT-2016-BLG-2605L b_2122-01-01T12:00:00.csv">
           <value>
             <Attribute>

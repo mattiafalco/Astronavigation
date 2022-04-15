@@ -37,7 +37,7 @@ targets = ['Proxima Cen b', 'Kepler-220 b', 'Kepler-847 b', 'Kepler-288 b', 'OGL
            'GJ 1252 b', 'HR 858 c', 'WASP-84 b', 'K2-80 b', 'HAT-P-46 b']
 # date
 date_ref = np.datetime64('2122-01-01T12:00:00')
-month = 0  # set 0 to have only one date
+month = 30  # set 0 to have only one date
 
 #################
 #
@@ -136,16 +136,17 @@ for date in dates:
         # Printing
         #
         #################
-        # print(f'dl: {np.rad2deg(dlt)*3600*1e6} muas')
-        # print(f'dl - sun: {np.rad2deg(dlt-dlt[0])*3600*1e6} muas\n')
-        #
-        # # point error
-        # print(f'pointing errors: {dr/AU} AU')
-        # print(f'pointing errors - sun: {(dr-dr[0])/AU} AU\n')
-        #
-        # # quadrupole
-        # print(f'dl quadrupole: {np.rad2deg(dl1_q)*3600*1e6} muas')
-        # print(f'dr quadrupole: {np.linalg.norm(x-x_obs)*dl1_q/AU} AU')
+        if len(dates) == 1:
+            print(f'dl: {np.rad2deg(dlt)*3600*1e6} muas')
+            print(f'dl - sun: {np.rad2deg(dlt-dlt[0])*3600*1e6} muas\n')
+
+            # point error
+            print(f'pointing errors: {dr/AU} AU')
+            print(f'pointing errors - sun: {(dr-dr[0])/AU} AU\n')
+
+            # quadrupole
+            print(f'dl quadrupole: {np.rad2deg(dl1_q)*3600*1e6} muas')
+            print(f'dr quadrupole: {np.linalg.norm(x-x_obs)*dl1_q/AU} AU')
 
         #################
         #
@@ -202,13 +203,14 @@ dr_nosun_date = np.array(dr_nosun_date).T
 # Plotting
 #
 #################
-fig = plt.figure()
-ax = plt.axes()
-ax.plot(dr_date[7]/AU)
+if len(dates) > 1:
+    fig = plt.figure()
+    ax = plt.axes()
+    ax.plot(dr_date[7]/AU)
 
-fig2 = plt.figure()
-ax2 = plt.axes()
-ax2.plot(dr_nosun_date[7]/AU)
+    fig2 = plt.figure()
+    ax2 = plt.axes()
+    ax2.plot(dr_nosun_date[7]/AU)
 
-plt.show()
+    plt.show()
 
