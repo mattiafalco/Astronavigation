@@ -77,7 +77,7 @@ class Body(object):
         body J2 parameter
     """
 
-    def __init__(self, mass, pos, vel=np.array([0, 0, 0]), radius=0, s=np.array([0, 0, 0]), J2=0):
+    def __init__(self, mass, pos, vel=np.array([0, 0, 0]), radius=0, s=np.array([0, 0, 1]), J2=0):
         """
         Parameters
         ----------

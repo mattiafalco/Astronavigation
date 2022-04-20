@@ -249,7 +249,7 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
     """
 
     # debug parameter, if true print some information
-    debug = False
+    debug = True
 
     # evaluate distance mass-source
     r = x - x_a
@@ -282,6 +282,8 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
         p5 = r_norm - r_obs_norm - np.dot(n_obs, l0) * sigma
 
         if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
+        # if debug: print(f'mod: {np.linalg.norm(M*eps**2*(p1*p2 + p3))}')
+        print(np.dot(n, l0) - np.dot(n_obs, l0))
 
         # evaluate deflection
         dl = -M*eps**2*(p1*p2 + p3) + 2*M*(eps**3)*p4*p5
@@ -394,7 +396,7 @@ def dx(l_obs, l0, x, x_a, x_obs, eps, v, M):
     return deltax
 
 
-def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R):
+def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R, quad=True):
     """
 
     Parameters
@@ -415,6 +417,8 @@ def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R):
         oblateness parameter
     R : float
         mass radius (in km)
+    quad : bool
+        evaluate or not the quadrupole contribution
 
     Returns
     -------
@@ -422,7 +426,7 @@ def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R):
         perturbation on the direction of observation
     """
     # debug parameter, if true print some information
-    debug = False
+    debug = True
 
     # evaluate distance mass-source
     r = x - x_a
@@ -437,11 +441,19 @@ def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R):
     d = r_obs - l0 * np.dot(r_obs, l0)
     d2 = np.linalg.norm(d)**2
 
+    if debug: print(f'd: {d}')
+
     # evaluate contributions
-    p1 = 4 * M / np.sqrt(d)
+    p1 = 4 * M / np.sqrt(d2)
     p2 = (15 * np.pi * M**2) / (4 * d2)
-    p3 = (4 * J2 * R**2 * M) / (np.sqrt(d)**3)
-    p4 = (128 * M**3) / (3 * np.sqrt(d)**3)
+    if quad:
+        p3 = (4 * J2 * R**2 * M) / (np.sqrt(d2)**3)
+        p4 = (128 * M**3) / (3 * np.sqrt(d2)**3)
+    else:
+        p3 = 0
+        p4 = 0
+
+    if debug: print(f'er p1: {p1}')
 
     # evaluate deflection
     dl = eps**2 * p1 + eps**4 * p2 + eps**2 * p3 + eps**6 * p4
@@ -493,6 +505,8 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
     # beta tilde
     beta = np.arccos(np.dot(x_a - x_obs, x - x_obs)
                      / (np.linalg.norm(x_a - x_obs) * np.linalg.norm(x - x_obs))) / theta_e
+
+    if debug: print(f'beta = {beta*theta_e}')
 
     # q
     q = - J2 * R**2 / (M**2 * eps**4) * (15/2)
