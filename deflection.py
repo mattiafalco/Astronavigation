@@ -449,6 +449,67 @@ def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R):
     return dl
 
 
+def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
+    """ This function evaluates the centroid shift of a source. It is valid only in grazing conditions, i.e.
+    x, x_a, x_obs have to be quasi-alligned.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        source position (in km)
+    x_a : np.ndarray
+        mass position (in km)
+    x_obs : np.ndarray
+        observer position (in km)
+    eps : float
+        small parameter, usually 1/c (in s/km)
+    M : float
+        mass parameter m*G (in km3/s2)
+    J2 : float
+        oblateness parameter
+    R : float
+        mass radius (in km)
+
+    Returns
+    -------
+    dtheta : np.ndarray
+        perturbation on the direction of observation
+
+    """
+    # debug parameter
+    debug = False
+
+    # distances
+    dl = np.linalg.norm(x_a - x_obs)
+    ds = np.linalg.norm(x - x_obs)
+    dls = np.linalg.norm(x - x_a)
+
+    # einstein ring
+    theta_e = np.sqrt((4 * M * dls) / (dl * ds) * eps**2)
+
+    # expansion parameter
+    xi = theta_e * ds / (4 * dls)
+
+    # beta tilde
+    beta = np.arccos(np.dot(x_a - x_obs, x - x_obs)
+                     / (np.linalg.norm(x_a - x_obs) * np.linalg.norm(x - x_obs))) / theta_e
+
+    # q
+    q = - J2 * R**2 / (M**2 * eps**4) * (15/2)
+
+    # evaluate useful combinations
+    p1 = beta / (beta**2 + 2)
+    p2 = -(15 * np.pi * (beta**2 + 1)) / (8 * (beta**2 + 2)**2)
+    p3 = 8/3 * dls**2/ds**2 * (beta**4 + 9*beta**2 -2)
+    p4 = -16 * (dls/ds * beta**2 - 2)
+    p5 = - (225 * np.pi**2) / (128 * (beta**2 + 2))
+    p6 = -4/15 * q
+
+    # evaluate dtheta
+    dtheta = p1 + p2 * xi + (beta / (beta**2 + 2)**2) * (p3 + p4 + p5 + p6) * xi**2
+
+    return dtheta
+
 
 if __name__ == "__main__":
     AU = 149597870.691  # [km]
