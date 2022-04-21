@@ -281,14 +281,14 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
         p4 = r_obs_norm * (dv - 2 * d * np.dot(v, d) / d2) / (d2 * r_norm)
         p5 = r_norm - r_obs_norm - np.dot(n_obs, l0) * sigma
 
-        if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
+        # if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4*p5}')
         # if debug: print(f'mod: {np.linalg.norm(M*eps**2*(p1*p2 + p3))}')
-        print(np.dot(n, l0) - np.dot(n_obs, l0))
+
 
         # evaluate deflection
         dl = -M*eps**2*(p1*p2 + p3) + 2*M*(eps**3)*p4*p5
 
-        if debug: print(f'dl: {dl}')
+        # if debug: print(f'dl: {dl}')
 
         return dl
     else:
@@ -396,7 +396,7 @@ def dx(l_obs, l0, x, x_a, x_obs, eps, v, M):
     return deltax
 
 
-def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R, quad=True):
+def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R, c1=True, c2=True, quad=True):
     """
 
     Parameters
@@ -417,6 +417,10 @@ def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R, quad=True):
         oblateness parameter
     R : float
         mass radius (in km)
+    c1 : bool
+        evaluate or not the monopole correction
+    c2 : bool
+        evaluate or not the quadrupole correction
     quad : bool
         evaluate or not the quadrupole contribution
 
@@ -441,19 +445,17 @@ def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R, quad=True):
     d = r_obs - l0 * np.dot(r_obs, l0)
     d2 = np.linalg.norm(d)**2
 
-    if debug: print(f'd: {d}')
+    if debug: print(f'd: {np.linalg.norm(d)} km')
 
     # evaluate contributions
     p1 = 4 * M / np.sqrt(d2)
-    p2 = (15 * np.pi * M**2) / (4 * d2)
+    p2 = (15 * np.pi * M**2) / (4 * d2) if c1 else 0
     if quad:
         p3 = (4 * J2 * R**2 * M) / (np.sqrt(d2)**3)
-        p4 = (128 * M**3) / (3 * np.sqrt(d2)**3)
+        p4 = (128 * M**3) / (3 * np.sqrt(d2)**3) if c2 else 0
     else:
         p3 = 0
         p4 = 0
-
-    if debug: print(f'er p1: {p1}')
 
     # evaluate deflection
     dl = eps**2 * p1 + eps**4 * p2 + eps**2 * p3 + eps**6 * p4

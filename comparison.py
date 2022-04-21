@@ -38,7 +38,7 @@ g = -np.pi/2
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 
 # targets
-targets = ['Proxima Cen b']
+targets = ['OGLE-2005-BLG-071L b']
 dist = np.array([getExo(pl, data).dist for pl in targets])
 
 # Create Solar System
@@ -56,7 +56,7 @@ list_exo = ['bh_7m']
 
 bh_7m = Body(mass=7*m_sun,
              pos=np.array([0, 10, 0])*pc,
-             radius=r_sun,
+             radius=r_jup,
              J2=J2_jup)
 
 exos = [bh_7m]
@@ -98,16 +98,20 @@ for x in x_stars:
     dl2 = []  # w/ null velocities
     dlq = []  # standard quadrupole
     dl_er = []  # Erez-Rosen
+    dl_er_c1 = []  # Erez-Rosen monopole correction
     dlq_er = []  # Erez-Rosen quadrupole
+    dlq_er_c2 = []  # Erez-Rosen quadrupole correction
     cs = []  # centroid-shift
 
     for pl in planets:
+
         # impact angle
         chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
-        print(f'chi: {chi}')
+        print(f'chi: {np.rad2deg(chi)*3600*1e6} muas')
         # direction
         l0 = -np.array([np.sin(chi), np.cos(chi), 0])
         x = -np.linalg.norm(x - x_obs) * l0 + x_obs
+
         # deflection
         dls = deflection_mod(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass, chi)
         dl1.append(np.linalg.norm(dls))
@@ -118,11 +122,17 @@ for x in x_stars:
         dls = deflection_mod(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, chi, pl.s, pl.J2, pl.radius)
         dlq.append(np.linalg.norm(dls))
         # deflection Erez-Rosen
-        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, quad=False)
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, c1=False, quad=False)
         dl_er.append(np.linalg.norm(dls))
+        # deflection Erez-Rosen monopole correction
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, quad=False)
+        dl_er_c1.append(np.linalg.norm(dls))
         # deflection quadrupole Erez-Rosen
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, c2=False)
+        dlq_er.append(np.linalg.norm(dls) - dl_er_c1[-1])  # subtract the monopole contribution
+        # deflection quadrupole correction Erez-Rosen
         dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius)
-        dlq_er.append(np.linalg.norm(dls) - dl_er[-1])  # subtract the monopole contribution
+        dlq_er_c2.append(np.linalg.norm(dls) - dl_er_c1[-1])  # subtract the monopole contribution
         # centroid shift
         delta = centroid_shift(x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius)
         cs.append(delta)
@@ -132,20 +142,24 @@ for x in x_stars:
     print(f'angle errors: {np.rad2deg(dl1)*3600*1e6} muas')
     print(f'angle errors v null: {np.rad2deg(dl2) * 3600 * 1e6} muas')
     print(f'angle errors er: {np.rad2deg(dl_er) * 3600 * 1e6} muas')
+    print(f'angle errors er_c1: {np.rad2deg(dl_er_c1) * 3600 * 1e6} muas')
     print(f'quadrupole: {np.rad2deg(dlq) * 3600 * 1e6} muas')
     print(f'quadrupole er: {np.rad2deg(dlq_er) * 3600 * 1e6} muas')
+    print(f'quadrupole er_c2: {np.rad2deg(dlq_er_c2) * 3600 * 1e6} muas')
     print(f'centroid shift: {np.rad2deg(cs) * 3600 * 1e6} muas')
 
 
     # saving
     if save:
         rows = list_p + list_exo
-        columns = ['dl_vn', 'dl', 'dl_er', 'dlq', 'dlq_er', 'centroid']
+        columns = ['dl_vn', 'dl', 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
         data = [np.rad2deg(dl2) * 3600 * 1e6,
                 np.rad2deg(dl1) * 3600 * 1e6,
                 np.rad2deg(dl_er) * 3600 * 1e6,
+                np.rad2deg(dl_er_c1) * 3600 * 1e6,
                 np.rad2deg(dlq) * 3600 * 1e6,
                 np.rad2deg(dlq_er) * 3600 * 1e6,
+                np.rad2deg(dlq_er_c2) * 3600 * 1e6,
                 np.rad2deg(cs) * 3600 * 1e6]
         path = f'Data/comparison'
         save_df(data, columns, rows, path)
