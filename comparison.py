@@ -38,8 +38,9 @@ g = -np.pi/2
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 
 # targets
-targets = ['OGLE-2005-BLG-071L b']
-dist = np.array([getExo(pl, data).dist for pl in targets])
+# targets = ['OGLE-2005-BLG-071L b']
+# dist = np.array([getExo(pl, data).dist for pl in targets])
+dist = np.array([100, 500, 1000, 2000]) * pc
 
 # Create Solar System
 ss = SolarSystem()
@@ -52,14 +53,24 @@ r_jup = ss.getPlanet('jupiter').radius
 J2_jup = ss.getPlanet('jupiter').J2
 
 # exo sources
-list_exo = ['bh_7m']
+list_exo = ['bh_7m', 'bh_20m', 'pl_1j']
 
 bh_7m = Body(mass=7*m_sun,
-             pos=np.array([0, 10, 0])*pc,
+             pos=np.array([0, 30, 0])*pc,
              radius=r_jup,
              J2=J2_jup)
 
-exos = [bh_7m]
+bh_20m = Body(mass=20*m_sun,
+              pos=np.array([0, 10, 0])*pc,
+              radius=r_jup,
+              J2=J2_jup)
+
+pl_1j = Body(mass=3*m_jup,
+             pos=np.array([0, 80, 0])*pc,
+             radius=r_jup,
+             J2=J2_jup)
+
+exos = [bh_7m, bh_20m, pl_1j]
 
 #################
 #
@@ -137,7 +148,6 @@ for x in x_stars:
         delta = centroid_shift(x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius)
         cs.append(delta)
 
-
     print(f'\n---------------------------------\nexoplanet at {np.linalg.norm(x)/pc} pc')
     print(f'angle errors: {np.rad2deg(dl1)*3600*1e6} muas')
     print(f'angle errors v null: {np.rad2deg(dl2) * 3600 * 1e6} muas')
@@ -147,7 +157,6 @@ for x in x_stars:
     print(f'quadrupole er: {np.rad2deg(dlq_er) * 3600 * 1e6} muas')
     print(f'quadrupole er_c2: {np.rad2deg(dlq_er_c2) * 3600 * 1e6} muas')
     print(f'centroid shift: {np.rad2deg(cs) * 3600 * 1e6} muas')
-
 
     # saving
     if save:
@@ -161,7 +170,7 @@ for x in x_stars:
                 np.rad2deg(dlq_er) * 3600 * 1e6,
                 np.rad2deg(dlq_er_c2) * 3600 * 1e6,
                 np.rad2deg(cs) * 3600 * 1e6]
-        path = f'Data/comparison'
+        path = f'Data/comparison_d{np.round(np.linalg.norm(x)/pc, 4)}pc'
         save_df(data, columns, rows, path)
 
 

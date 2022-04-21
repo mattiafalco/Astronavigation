@@ -249,7 +249,7 @@ def deflection_mod(l0, x, x_a, x_obs, eps, v, M, chi, s=0, J2=0, R=0):
     """
 
     # debug parameter, if true print some information
-    debug = True
+    debug = False
 
     # evaluate distance mass-source
     r = x - x_a
@@ -430,7 +430,7 @@ def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R, c1=True, c2=True, quad=True)
         perturbation on the direction of observation
     """
     # debug parameter, if true print some information
-    debug = True
+    debug = False
 
     # evaluate distance mass-source
     r = x - x_a
@@ -514,12 +514,15 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
     q = - J2 * R**2 / (M**2 * eps**4) * (15/2)
 
     # evaluate useful combinations
-    p1 = beta / (beta**2 + 2)
+    p1 = beta * (beta**2 + 3) / (beta**2 + 2)
     p2 = -(15 * np.pi * (beta**2 + 1)) / (8 * (beta**2 + 2)**2)
     p3 = 8/3 * dls**2/ds**2 * (beta**4 + 9*beta**2 -2)
     p4 = -16 * (dls/ds * beta**2 - 2)
     p5 = - (225 * np.pi**2) / (128 * (beta**2 + 2))
     p6 = -4/15 * q
+
+    if debug: print(f'beta: {beta},   theta: {theta_e}')
+    if debug: print(f'p1: {p1}, p2: {p2}, p3: {p3}, p4:{p4}, p5: {p5}, p6:{p6}')
 
     # evaluate dtheta
     dtheta = p1 + p2 * xi + (beta / (beta**2 + 2)**2) * (p3 + p4 + p5 + p6) * xi**2
