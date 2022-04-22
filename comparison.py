@@ -70,6 +70,10 @@ pl_1j = Body(mass=3*m_jup,
              radius=r_jup,
              J2=J2_jup)
 
+worm_1j = Body(mass=0,
+               pos=np.array([0, 10, 0])*pc,
+               radius=r_jup)
+
 exos = [bh_7m, bh_20m, pl_1j]
 
 #################
@@ -114,11 +118,20 @@ for x in x_stars:
     dlq_er_c2 = []  # Erez-Rosen quadrupole correction
     cs = []  # centroid-shift
 
+    count = 1
     for pl in planets:
 
-        # impact angle
-        chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
+        # impact angle, use grazing condition for solar system bodies
+        # and einstein ring for exo bodies.
+        # comment "count += 1" to use always the grazing condition.
+        if count <= len(list_p):
+            chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
+            count += 1
+        else:
+            chi = 0.25 * np.sqrt(4 * pl.mass * (np.linalg.norm(x) - pl.dist) / (np.linalg.norm(x) * pl.dist)) / c
+
         print(f'chi: {np.rad2deg(chi)*3600*1e6} muas')
+
         # direction
         l0 = -np.array([np.sin(chi), np.cos(chi), 0])
         x = -np.linalg.norm(x - x_obs) * l0 + x_obs
@@ -148,6 +161,14 @@ for x in x_stars:
         delta = centroid_shift(x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius)
         cs.append(delta)
 
+    # ellis wormhole deflection
+    chi = np.cbrt(np.pi / 4 * np.linalg.norm(x - worm_1j.pos) * worm_1j.radius ** 2
+                  / (np.linalg.norm(x - x_obs) * np.linalg.norm(worm_1j.pos - x_obs) ** 2))
+    l0 = -np.array([np.sin(chi), np.cos(chi), 0])
+    x = worm_1j.dist * l0 + x_obs
+    dls = ellis_deflection(l0, x, worm_1j.pos, x_obs, worm_1j.radius)
+    print(f'd: {chi*np.linalg.norm(worm_1j.pos - x_obs)} km')
+
     print(f'\n---------------------------------\nexoplanet at {np.linalg.norm(x)/pc} pc')
     print(f'angle errors: {np.rad2deg(dl1)*3600*1e6} muas')
     print(f'angle errors v null: {np.rad2deg(dl2) * 3600 * 1e6} muas')
@@ -157,6 +178,9 @@ for x in x_stars:
     print(f'quadrupole er: {np.rad2deg(dlq_er) * 3600 * 1e6} muas')
     print(f'quadrupole er_c2: {np.rad2deg(dlq_er_c2) * 3600 * 1e6} muas')
     print(f'centroid shift: {np.rad2deg(cs) * 3600 * 1e6} muas')
+
+    print(f'\nellis chi: {np.rad2deg(chi) * 3600 * 1e6} muas')
+    print(f'ellis wormhole: {np.rad2deg(dls)*3600*1e6} muas')
 
     # saving
     if save:
