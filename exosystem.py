@@ -1,4 +1,5 @@
-""" Description
+""" This program evaluates the deflection of light due to the mean exoplanet
+where the mean values are taken from the catalogue.
 
 Creator: mattiafalco
 Date: 13/04/22 

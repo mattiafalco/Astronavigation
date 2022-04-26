@@ -1,4 +1,5 @@
-""" Description
+""" This program evaluates the deflection on a target planet due to some bodies in
+the solar system and a black hole over a given period and plot the results.
 
 Creator: Mattia Falco
 Date: 06/04/2022 

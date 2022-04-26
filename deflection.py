@@ -1,6 +1,8 @@
 """ This file contains useful functions which make the code easier to read
 and also the two main functions used to evaluate the deflection of light rays
-in the IAU metric as well as the distances.
+in the IAU metric as well as the distances. Other types of deflection formulas are
+implemented such as Erez-Rosen or Ellis wormhole.
+
 Creator: Mattia Falco
 Date: 17/03/2022
 """

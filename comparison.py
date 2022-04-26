@@ -1,4 +1,15 @@
-""" Description
+""" This program makes a comparison between different formulas and different
+contributions of light deflection. For different types of bodies in the Solar System
+and also exo bodies. The quantity taken in consideration are:
+- deflection w/ null velocity
+- deflection w/ velocity
+- Erez-Rosen deflection
+- Erez-Rosen monopole correction
+- quadrupole deflection
+- Erez-Rosen quadrupole deflection
+- Erez-Rosen quadrupole correction
+- Erez-Rosen centroid shift
+an Ellis wormhole is also considered.
 
 Creator: Mattia Falco
 Date: 20/04/2022
@@ -22,6 +33,16 @@ eps = 1/c
 path = 'exo_archive.csv'
 data = pd.read_csv(path)
 
+# Create Solar System
+ss = SolarSystem()
+
+# useful values
+m_sun = ss.getSun().mass
+r_sun = ss.getSun().radius
+m_jup = ss.getPlanet('jupiter').mass
+r_jup = ss.getPlanet('jupiter').radius
+J2_jup = ss.getPlanet('jupiter').J2
+
 # save parameter
 save = True
 
@@ -41,16 +62,6 @@ list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # targets = ['OGLE-2005-BLG-071L b']
 # dist = np.array([getExo(pl, data).dist for pl in targets])
 dist = np.array([100, 500, 1000, 2000]) * pc
-
-# Create Solar System
-ss = SolarSystem()
-
-# useful values
-m_sun = ss.getSun().mass
-r_sun = ss.getSun().radius
-m_jup = ss.getPlanet('jupiter').mass
-r_jup = ss.getPlanet('jupiter').radius
-J2_jup = ss.getPlanet('jupiter').J2
 
 # exo sources
 list_exo = ['bh_7m', 'bh_20m', 'pl_1j']
@@ -128,7 +139,7 @@ for x in x_stars:
             chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
             count += 1
         else:
-            chi = 0.25 * np.sqrt(4 * pl.mass * (np.linalg.norm(x) - pl.dist) / (np.linalg.norm(x) * pl.dist)) / c
+            chi = 1 * np.sqrt(4 * pl.mass * (np.linalg.norm(x) - pl.dist) / (np.linalg.norm(x) * pl.dist)) / c
 
         print(f'chi: {np.rad2deg(chi)*3600*1e6} muas')
 
