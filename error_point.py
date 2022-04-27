@@ -73,12 +73,12 @@ for x in x_stars:
         chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
         # direction
         l0 = -np.array([np.sin(chi), np.cos(chi), 0])
-        x = -np.linalg.norm(x)*l0
+        x = -np.linalg.norm(x - x_obs)*l0 + x_obs
         # deflection
-        dls = deflection_mod(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass, chi)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
         dl1.append(np.linalg.norm(dls))
         # deflection w/ null velocities
-        dls = deflection_mod(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, chi)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
         dl2.append(np.linalg.norm(dls))
 
     dlt = np.cumsum(dl1)
@@ -118,8 +118,8 @@ for x in x_stars:
         l0q = -np.array([np.sin(chi), np.cos(chi), 0])
         x = -np.linalg.norm(x - x_obs) * l0q + x_obs
         # deflection
-        dls = deflection_mod(l0q, x, pl.pos, x_obs, eps, pl.vel, pl.mass, chi,
-                             pl.s, pl.J2, pl.radius)
+        dls = deflection(l0q, x, pl.pos, x_obs, eps, pl.vel, pl.mass,
+                         pl.s, pl.J2, pl.radius)
         dl_q.append(np.linalg.norm(dls))
     dlt_q = np.cumsum(np.array(dl_q))
     dr_q = np.linalg.norm(x-x_obs)*dlt_q

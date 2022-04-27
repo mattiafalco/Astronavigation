@@ -488,7 +488,7 @@ def ellis_deflection(l0, x, x_a, x_obs, a):
         perturbation on the direction of observation
     """
     # debug parameter, if true print some information
-    debug = True
+    debug = False
 
     # evaluate distance mass-source
     r = x - x_a
@@ -578,7 +578,7 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
     # evaluate dtheta
     dtheta = p1 + p2 * xi + (beta / (beta ** 2 + 2) ** 2) * (p3 + p4 + p5 + p6) * xi ** 2
 
-    return dtheta
+    return dtheta * theta_e
 
 
 if __name__ == "__main__":

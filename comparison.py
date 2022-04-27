@@ -148,13 +148,13 @@ for x in x_stars:
         x = -np.linalg.norm(x - x_obs) * l0 + x_obs
 
         # deflection
-        dls = deflection_mod(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass, chi)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
         dl1.append(np.linalg.norm(dls))
         # deflection w/ null velocities
-        dls = deflection_mod(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, chi)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
         dl2.append(np.linalg.norm(dls))
         # deflection quadrupole
-        dls = deflection_mod(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, chi, pl.s, pl.J2, pl.radius)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, pl.s, pl.J2, pl.radius)
         dlq.append(np.linalg.norm(dls))
         # deflection Erez-Rosen
         dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, c1=False, quad=False)
@@ -173,12 +173,12 @@ for x in x_stars:
         cs.append(delta)
 
     # ellis wormhole deflection
-    chi = np.cbrt(np.pi / 4 * np.linalg.norm(x - worm_1j.pos) * worm_1j.radius ** 2
+    chi = 1 * np.cbrt(np.pi / 4 * np.linalg.norm(x - worm_1j.pos) * worm_1j.radius ** 2
                   / (np.linalg.norm(x - x_obs) * np.linalg.norm(worm_1j.pos - x_obs) ** 2))
     l0 = -np.array([np.sin(chi), np.cos(chi), 0])
     x = worm_1j.dist * l0 + x_obs
     dls = ellis_deflection(l0, x, worm_1j.pos, x_obs, worm_1j.radius)
-    print(f'd: {chi*np.linalg.norm(worm_1j.pos - x_obs)} km')
+    # print(f'd: {chi*np.linalg.norm(worm_1j.pos - x_obs)} km')
 
     print(f'\n---------------------------------\nexoplanet at {np.linalg.norm(x)/pc} pc')
     print(f'angle errors: {np.rad2deg(dl1)*3600*1e6} muas')
@@ -191,7 +191,7 @@ for x in x_stars:
     print(f'centroid shift: {np.rad2deg(cs) * 3600 * 1e6} muas')
 
     print(f'\nellis chi: {np.rad2deg(chi) * 3600 * 1e6} muas')
-    print(f'ellis wormhole: {np.rad2deg(dls)*3600*1e6} muas')
+    print(f'ellis wormhole: {np.rad2deg(dls)*3600*1e6} muas\n')
 
     # saving
     if save:
