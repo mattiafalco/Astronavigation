@@ -1,22 +1,28 @@
-""" This program evaluates the deflection on a target planet due to some bodies in
-the solar system and a black hole over a given period and plot the results.
+"""
 
-Creator: Mattia Falco
-Date: 06/04/2022 
+Creator: mattiafalco
+date: 27/04/22
 """
 
 import numpy as np
 from deflection import *
 from astropy import constants
 from planets import Body, SolarSystem
-import matplotlib.pyplot as plt
+import pandas as pd
+from read_exo import getExo
+from save_df import save_df
 
 # Define constants
 pc = constants.pc.to('km').value
 AU = constants.au.to('km').value
 c = constants.c.to('km/s').value
-GM_sun = constants.GM_sun.to('km3/s2').value
 eps = 1/c
+
+# Create Solar System
+ss = SolarSystem()
+
+# save parameter
+save = True
 
 ######################################
 #
@@ -24,152 +30,105 @@ eps = 1/c
 #
 ######################################
 
-# black hole
-bh = Body(mass=7.1*GM_sun,
-          pos=np.array([-4, -1580, -45])*pc,
-          vel=np.array([0, 0, 0]))#np.array([3, 0, 40]))
+# angle of observation
+positions = [0, -np.pi]
 
-# observer
-obs = 'earth'
 # masses
-list_p =['sun', 'jupiter', 'saturn']
-# target
-dist = 3000*pc
+list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 
-# Time
-t_span = np.arange(0, 1*365)  # day
+# targets
+dist = 10000 * pc
+
 
 #################
 #
 # Algorithm
 #
 #################
-
-# Create Solar System
-ss = SolarSystem()
-
-# target
-ll = bh.pos/bh.dist
-the = 10*np.sqrt(4*bh.mass*(dist - bh.dist)/(dist * bh.dist))/c
-l_tar = np.array([ll[0]*np.cos(the) - ll[1]*np.sin(the),
-                  ll[0]*np.sin(the) + ll[1]*np.cos(the),
-                  ll[2]])
-x1 = l_tar*dist
-# x2 = ll*dist
-print(np.rad2deg(the) * 3600 * 1e6)
-
-x = x1
-
-# create dictionary to save data
-dl_dict = {}
-dl_dict['bh'] = []
-for pl in list_p:
-    dl_dict[pl] = []
-dl_dict['tot'] = []
-
-for t in t_span:
-
-    # bh.pos = bh.pos + t*24*3600*bh.vel
+count = 1
+for g in positions:
 
     # observer
-    anom = ss.getPlanet(obs).speed / ss.getPlanet(obs).dist * t * 24 * 3600
-    x_obs = ss.getPlanet(obs, anom=anom).pos
+    x_obs = AU*np.array([np.cos(g), np.sin(g), 0])
 
-    # line of sight
-    l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
+    # take bodies which generate grav. field
+    planets = [ss.getPlanet(pl) for pl in list_p]
 
+    v_null = np.array([0, 0, 0])
+
+    # targets
+    x = np.array([0, dist, 0])
+
+    # internal loop on the masses, evaluate deflections
     dl1 = []
+    dl2 = []  # w/ null velocities
+    dlq = []  # standard quadrupole
+    dl_er = []  # Erez-Rosen
+    dl_er_c1 = []  # Erez-Rosen monopole correction
+    dlq_er = []  # Erez-Rosen quadrupole
+    dlq_er_c2 = []  # Erez-Rosen quadrupole correction
+    cs = []  # centroid-shift
 
-    # bh deflection
-    dls = deflection(l0, x, bh.pos, x_obs, eps, bh.vel, bh.mass)
-    dl1.append(np.linalg.norm(dls))
+    for pl in planets:
 
-    dl_dict['bh'].append(np.linalg.norm(dls))
+        # print impact angle
+        chi = np.arccos(np.dot(pl.pos - x_obs, x - x_obs) /
+                        (np.linalg.norm(pl.pos - x_obs) * np.linalg.norm(x - x_obs)))
+        print(f'chi: {chi}')
 
-    # planets deflection
-    for planet in list_p:
+        # direction
+        l0 = -(x-x_obs)/np.linalg.norm(x-x_obs)
 
-        if planet != 'sun':
-            anom_p = ss.getPlanet(planet).speed/ss.getPlanet(planet).dist * t * 24 * 3600
-        else:
-            anom_p = 0
-
-        pl = ss.getPlanet(planet, anom=anom_p)
+        # deflection
         dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
         dl1.append(np.linalg.norm(dls))
-        dl_dict[planet].append(np.linalg.norm(dls))
+        # deflection w/ null velocities
+        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
+        dl2.append(np.linalg.norm(dls))
+        # deflection quadrupole
+        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, pl.s, pl.J2, pl.radius)
+        dlq.append(np.linalg.norm(dls))
+        # deflection Erez-Rosen
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, c1=False, quad=False)
+        dl_er.append(np.linalg.norm(dls))
+        # deflection Erez-Rosen monopole correction
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, quad=False)
+        dl_er_c1.append(np.linalg.norm(dls))
+        # deflection quadrupole Erez-Rosen
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, c2=False)
+        dlq_er.append(np.linalg.norm(dls) - dl_er_c1[-1])  # subtract the monopole contribution
+        # deflection quadrupole correction Erez-Rosen
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius)
+        dlq_er_c2.append(np.linalg.norm(dls) - dl_er_c1[-1])  # subtract the monopole contribution
+        # centroid shift
+        delta = centroid_shift(x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius)
+        cs.append(delta)
 
-    dlt = np.sum(dl1)
+    print(f'\n---------------------------------\nexoplanet at {np.linalg.norm(x)/pc} pc')
+    print(f'angle errors: {np.rad2deg(dl1)*3600*1e6} muas')
+    print(f'angle errors v null: {np.rad2deg(dl2) * 3600 * 1e6} muas')
+    print(f'angle errors er: {np.rad2deg(dl_er) * 3600 * 1e6} muas')
+    print(f'angle errors er_c1: {np.rad2deg(dl_er_c1) * 3600 * 1e6} muas')
+    print(f'quadrupole: {np.rad2deg(dlq) * 3600 * 1e6} muas')
+    print(f'quadrupole er: {np.rad2deg(dlq_er) * 3600 * 1e6} muas')
+    print(f'quadrupole er_c2: {np.rad2deg(dlq_er_c2) * 3600 * 1e6} muas')
+    print(f'centroid shift: {np.rad2deg(cs) * 3600 * 1e6} muas')
 
-    dl_dict['tot'].append(dlt)
-
-    #################
-    #
-    # Printing
-    #
-    #################
-
-    #print(f'day = {t}')
-    #print(f'angle errors: {np.rad2deg(dl1) * 3600 * 1e6} muas\n')
-
-#################
-#
-# Plot
-#
-#################
-
-# deflection plots
-fig, ax = plt.subplots()
-dl_muas = np.rad2deg(np.array(dl_dict['bh'])) * 3600 * 1e6
-ax.plot(t_span, dl_muas)
-plt.title('BH deflection')
-plt.xlabel('t [day]')
-plt.ylabel('dl [muas]')
-
-for pl in list_p:
-    fig, ax = plt.subplots()
-    dl_muas = np.rad2deg(np.array(dl_dict[pl])) * 3600 * 1e6
-    ax.plot(t_span, dl_muas)
-    plt.title(f'{pl} deflection')
-    plt.xlabel('t [day]')
-    plt.ylabel('dl [muas]')
-
-# # distance plots
-# fig, ax = plt.subplots()
-# dr = np.array(dl_dict['bh']) * dist / AU
-# ax.plot(t_span, dr)
-# plt.title('BH err dist')
-# plt.xlabel('t [day]')
-# plt.ylabel('dr [AU]')
-#
-# for pl in list_p:
-#     fig, ax = plt.subplots()
-#     dr = np.array(dl_dict[pl]) * dist / AU
-#     ax.plot(t_span, dr)
-#     plt.title(f'{pl} err dist')
-#     plt.xlabel('t [day]')
-#     plt.ylabel('dr [AU]')
-
-
-fig2 = plt.figure()
-ax2 = plt.axes(projection='3d')
-ax2.plot(0.0, 0.0, 0.0, marker='^', color='blue', label='sun')
-ax2.plot(x[0]/pc, x[1]/pc, x[2]/pc, marker='o', color='red', label='target')
-ax2.plot(bh.pos[0]/pc, bh.pos[1]/pc, bh.pos[2]/pc, marker='o', color='black', label='bh')
-# ax2.plot(x2[0]/pc, x2[1]/pc, x2[2]/pc, marker='o', color='green')
-plt.legend()
-
-fig4 = plt.figure()
-ax4 = plt.axes(projection='3d')
-ax4.plot(0.0, 0.0, 0.0, marker='^', color='blue', label='sun')
-for pl in ['earth', 'jupiter', 'saturn']:
-    x_p = ss.getPlanet(pl, anom=0).pos
-    ax4.plot(x_p[0], x_p[1], x_p[2], label=pl, marker='o')
-ax4.plot(ll[0]*10*AU, ll[1]*10*AU, ll[2]*10*AU, label='bh', marker='o')
-plt.legend()
-
-
-plt.show()
+    # saving
+    if save:
+        rows = list_p
+        columns = ['dl_vn', 'dl', 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
+        data = [np.rad2deg(dl2) * 3600 * 1e6,
+                np.rad2deg(dl1) * 3600 * 1e6,
+                np.rad2deg(dl_er) * 3600 * 1e6,
+                np.rad2deg(dl_er_c1) * 3600 * 1e6,
+                np.rad2deg(dlq) * 3600 * 1e6,
+                np.rad2deg(dlq_er) * 3600 * 1e6,
+                np.rad2deg(dlq_er_c2) * 3600 * 1e6,
+                np.rad2deg(cs) * 3600 * 1e6]
+        path = f'Data/parallax{count}'
+        save_df(data, columns, rows, path)
+        count += 1
 
 
 
