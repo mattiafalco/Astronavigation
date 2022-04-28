@@ -85,6 +85,7 @@ for g in positions:
         # deflection w/ null velocities
         dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
         dl2.append(np.linalg.norm(dls))
+        print(dls)
         # deflection quadrupole
         dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, pl.s, pl.J2, pl.radius)
         dlq.append(np.linalg.norm(dls))
