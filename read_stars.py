@@ -68,6 +68,10 @@ bh_7m = Body(mass=7*m_sun,
 
 bodies = [jup, bh_7m]
 
+worm_1j = Body(mass=0,
+               pos=mean_star/2,
+               radius=r_jup)
+
 # observer on earth
 x_obs = mean_star * AU / pc
 
@@ -96,3 +100,22 @@ for pl_name, pl in zip(list_p, bodies):
         data = [np.rad2deg(dl1) * 3600 * 1e6]
         path = f'Data/{pl_name}_deflections'
         save_df(data, columns, rows, path)
+
+# ellis wormhole
+dl1 = []
+for x in x_star:
+
+    # direction
+    l0 = -(x - x_obs) / np.linalg.norm(x - x_obs)
+
+    # deflection
+    dls = ellis_deflection(l0, x, worm_1j.pos, x_obs, worm_1j.radius)
+    dl1.append(np.linalg.norm(dls))
+
+if save:
+    rows = range(len(x_star))
+    columns = ['dl_vn']
+    data = [np.rad2deg(dl1) * 3600 * 1e6]
+    path = f'Data/ellis_deflections'
+    save_df(data, columns, rows, path)
+
