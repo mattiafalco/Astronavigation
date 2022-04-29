@@ -565,7 +565,8 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
     q = - J2 * R ** 2 / (M ** 2 * eps ** 4) * (15 / 2)
 
     # evaluate useful combinations
-    p1 = beta * (beta ** 2 + 3) / (beta ** 2 + 2)
+    # p1 = beta * (beta ** 2 + 3) / (beta ** 2 + 2)
+    p1 = beta / (beta ** 2 + 2)
     p2 = -(15 * np.pi * (beta ** 2 + 1)) / (8 * (beta ** 2 + 2) ** 2)
     p3 = 8 / 3 * dls ** 2 / ds ** 2 * (beta ** 4 + 9 * beta ** 2 - 2)
     p4 = -16 * (dls / ds * beta ** 2 - 2)

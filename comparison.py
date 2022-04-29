@@ -61,28 +61,28 @@ list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # targets
 # targets = ['OGLE-2005-BLG-071L b']
 # dist = np.array([getExo(pl, data).dist for pl in targets])
-dist = np.array([100, 500, 1000, 2000]) * pc
+dist = np.array([10, 500, 1000, 2000]) * pc
 
 # exo sources
 list_exo = ['bh_7m', 'bh_20m', 'pl_1j']
 
 bh_7m = Body(mass=7*m_sun,
-             pos=np.array([0, 30, 0])*pc,
+             pos=np.array([0, 3, 0])*pc,
              radius=r_jup,
              J2=J2_jup)
 
 bh_20m = Body(mass=20*m_sun,
-              pos=np.array([0, 10, 0])*pc,
+              pos=np.array([0, 1, 0])*pc,
               radius=r_jup,
               J2=J2_jup)
 
 pl_1j = Body(mass=3*m_jup,
-             pos=np.array([0, 80, 0])*pc,
+             pos=np.array([0, 8, 0])*pc,
              radius=r_jup,
              J2=J2_jup)
 
 worm_1j = Body(mass=0,
-               pos=np.array([0, 10, 0])*pc,
+               pos=np.array([0, 1, 0])*pc,
                radius=r_jup)
 
 exos = [bh_7m, bh_20m, pl_1j]

@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/comparison_d1.0pc.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/comparison_d10.0pc.csv">
           <value>
             <Attribute>
@@ -46,6 +53,20 @@
           </value>
         </entry>
         <entry key="/Data/comparison_d500.0pc.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/ellis_deflections.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/jupiter4_deflections.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

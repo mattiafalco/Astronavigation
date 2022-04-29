@@ -55,7 +55,7 @@ mean_star = np.mean(x_star, axis=0)
 #
 ################################################################
 
-list_p = ['jupiter', 'bh_7m']
+list_p = ['jupiter', 'bh_7m', 'jupiter4']
 
 jup = ss.getPlanet('jupiter')
 jup.pos = mean_star/2
@@ -66,7 +66,12 @@ bh_7m = Body(mass=7*m_sun,
              radius=r_jup,
              J2=J2_jup)
 
-bodies = [jup, bh_7m]
+jup4 = Body(mass=4*m_jup,
+            pos=mean_star/2,
+            radius=r_jup,
+            J2=J2_jup)
+
+bodies = [jup, bh_7m, jup4]
 
 worm_1j = Body(mass=0,
                pos=mean_star/2,
@@ -85,7 +90,7 @@ for pl_name, pl in zip(list_p, bodies):
         # print impact angle
         chi = np.arccos(np.dot(pl.pos - x_obs, x - x_obs) /
                         (np.linalg.norm(pl.pos - x_obs) * np.linalg.norm(x - x_obs)))
-        print(f'chi: {np.rad2deg(chi)*3600}')
+        print(f'chi: {np.rad2deg(chi)*3600} arcs')
 
         # direction
         l0 = -(x - x_obs) / np.linalg.norm(x - x_obs)
