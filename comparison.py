@@ -59,8 +59,6 @@ g = -np.pi/2
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 
 # targets
-# targets = ['OGLE-2005-BLG-071L b']
-# dist = np.array([getExo(pl, data).dist for pl in targets])
 dist = np.array([10, 500, 1000, 2000]) * pc
 
 # exo sources

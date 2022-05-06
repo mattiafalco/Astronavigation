@@ -85,7 +85,7 @@ worm_1j = Body(mass=0,
                radius=r_jup)
 
 # observer on earth
-x_obs = mean_star * AU / pc
+x_obs =np.array([0, 0, 0])  # mean_star * AU / pc
 
 for pl_name, pl in zip(list_p, bodies):
 
