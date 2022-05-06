@@ -90,6 +90,31 @@ def quadru(pl):
     return s, J2
 
 
+def parallax_shift(dl, l0, r):
+    """
+
+    Parameters
+    ----------
+    dl : float
+        norm of the deflection
+    l0 : np.ndarray
+        unperturbed direction
+    r : np.ndarray
+        observer position (in km)
+
+    Returns
+    -------
+    dw : float
+        parallactic shift
+
+    """
+
+    p = np.cross(l0, np.cross(l0, r))
+    dw = dl / np.linalg.norm(p)
+
+    return dw
+
+
 #########################
 #
 # Main functions
