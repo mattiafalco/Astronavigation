@@ -114,6 +114,29 @@ def parallax_shift(dl, l0, r):
 
     return dw
 
+def einstein_ring(mg, eps, x_a, x):
+    """
+
+    Parameters
+    ----------
+    mg : float
+        mass parameter m*G (in km3/s2)
+    eps : float
+        1/c
+    x_a : np.ndarray
+        mass position (in km)
+    x : np.ndarray
+        source position (in km)
+
+    Returns
+    -------
+    theta : float
+        einsten ring
+    """
+
+    theta = np.sqrt(4 * mg * (np.linalg.norm(x) - np.linalg.norm(x_a))
+                    / (np.linalg.norm(x) * np.linalg.norm(x_a))) * eps
+    return theta
 
 #########################
 #
@@ -567,7 +590,7 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
 
     """
     # debug parameter
-    debug = False
+    debug = True
 
     # distances
     dl = np.linalg.norm(x_a - x_obs)

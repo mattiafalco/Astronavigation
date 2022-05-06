@@ -48,10 +48,9 @@ dist = np.array([1, 10, 100])*pc
 ss = SolarSystem()
 
 # observer
-x_obs = ss.getPlanet(obs, anom=-np.pi/2).pos
+x_obs = ss.getPlanet(obs, anom=0).pos
 
 # take bodies which generate grav. field
-# planets = [ss.getPlanet(pl) for pl in list_p]
 planets = []
 for pl in list_p:
 
@@ -80,11 +79,8 @@ for x in x_stars:
     # internal loop on the masses, evaluate deflections
     for pl in planets:
 
-        # impact angle
-        chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
         # direction
-        l0 = -np.array([np.sin(chi), np.cos(chi), 0])
-        x = -np.linalg.norm(x - x_obs)*l0 + x_obs
+        l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
 
         # deflection w/ null velocities
         dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
@@ -107,22 +103,23 @@ for x in x_stars:
     par2 = np.array(par2) * pc
     parq = np.array(parq) * pc
 
+    # distance error
+    dd1 = par1 * (np.linalg.norm(x-x_obs)/pc)**2
+    dd2 = par2 * (np.linalg.norm(x - x_obs)/pc) ** 2
+    ddq = parq * (np.linalg.norm(x - x_obs)/pc) ** 2
+
     # point error
     dr1 = np.linalg.norm(x-x_obs)*dl1
     dr2 = np.linalg.norm(x-x_obs)*dl2
     drq = np.linalg.norm(x-x_obs)*dlq
-
-    # parallax error
-    dw1 = (dr1/pc) / (np.linalg.norm(x - x_obs)/pc)**2
-    dw2 = 1 / dr2
-    dwq = 1 / drq
 
     print(f'\n---------------------------------\nexoplanet at {np.linalg.norm(x)/pc} pc')
     print(f'angle errors v_null: {np.rad2deg(dl1)*3600*1e6} muas')
     print(f'angle errors: {np.rad2deg(dl2) * 3600 * 1e6} muas')
     print(f'quadrupole: {np.rad2deg(dlq) * 3600 * 1e6} muas')
     print(f'parallax shift: {par1*1e6} muas')
-    print(f'dr^-1: {dw1} arcs')
+    print(f'distance error: {dd1*pc/AU} AU')
+    print(f'point error: {dr1/AU} AU')
 
     # saving
     if save:

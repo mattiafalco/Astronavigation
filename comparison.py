@@ -137,7 +137,8 @@ for x in x_stars:
             chi = pl.radius / np.linalg.norm(x_obs - pl.pos)
             count += 1
         else:
-            chi = 1 * np.sqrt(4 * pl.mass * (np.linalg.norm(x) - pl.dist) / (np.linalg.norm(x) * pl.dist)) / c
+            # chi = 1 * np.sqrt(4 * pl.mass * (np.linalg.norm(x) - pl.dist) / (np.linalg.norm(x) * pl.dist)) / c
+            chi = einstein_ring(pl.mass, eps, pl.pos, x)
 
         print(f'chi: {np.rad2deg(chi)*3600*1e6} muas')
 
