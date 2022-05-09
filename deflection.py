@@ -562,6 +562,42 @@ def ellis_deflection(l0, x, x_a, x_obs, a):
     return dl
 
 
+def cs_beta(beta, ds, dls, theta, q=0):
+    """ This function evaluates the centroid shift of a source with a given value
+    of the impact angle beta expressed in units of einstein ring. It is valid only in grazing conditions.
+
+    Parameters
+    ----------
+    beta : float
+        impact angle in units of einstein ring
+    ds : float
+        observer - source distance
+    dls : float
+        lens - source distance
+    theta : float
+        einstein ring
+    q : float
+        Erez-Rosen quadrupole term
+    Returns
+    -------
+    dtheta : float
+        centroid shift
+    """
+
+    # expansion parameter
+    xi = theta * ds / (4 * dls)
+
+    p1 = beta / (beta ** 2 + 2)
+    p2 = -(15 * np.pi * (beta ** 2 + 1)) / (8 * (beta ** 2 + 2) ** 2)
+    p3 = 8 / 3 * dls ** 2 / ds ** 2 * (beta ** 4 + 9 * beta ** 2 - 2)
+    p4 = -16 * (dls / ds * beta ** 2 - 2)
+    p5 = - (225 * np.pi ** 2) / (128 * (beta ** 2 + 2))
+    p6 = -4 / 15 * q
+
+    dtheta = p1 + p2 * xi + (beta / (beta ** 2 + 2) ** 2) * (p3 + p4 + p5 + p6) * xi ** 2
+
+    return dtheta * theta
+
 def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
     """ This function evaluates the centroid shift of a source. It is valid only in grazing conditions, i.e.
     x, x_a, x_obs have to be quasi-alligned.
@@ -585,8 +621,8 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
 
     Returns
     -------
-    dtheta : np.ndarray
-        perturbation on the direction of observation
+    dtheta : float
+        centroid shift
 
     """
     # debug parameter
