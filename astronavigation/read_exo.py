@@ -6,8 +6,8 @@ Date: 31/03/22.
 
 import pandas as pd
 import numpy as np
-from planets import Body
-from deflection import cartesian
+from astronavigation.planets import Body
+from astronavigation.deflection import cartesian
 from astropy import constants
 
 
@@ -138,7 +138,7 @@ def getExoAll(df):
 
 if __name__ == "__main__":
 
-    path = 'exo_archive.csv'
+    path = '../exo_archive.csv'
     data = pd.read_csv(path)
 
     print('---------------- test1 --------------')

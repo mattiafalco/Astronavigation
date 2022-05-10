@@ -181,7 +181,7 @@ def deflection(l0, x, x_a, x_obs, eps, v, M,
         perturbation on the direction of observation
     """
     # debug parameter, if true print some information
-    debug = True
+    debug = False
 
     # evaluate distance mass-source
     r = x - x_a

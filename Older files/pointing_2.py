@@ -1,4 +1,4 @@
-from deflection import *
+from astronavigation.deflection import *
 from planets import SolarSystem
 
 # pc = constants.pc.to('km').value

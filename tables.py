@@ -4,9 +4,8 @@ Creator: mattiafalco
 Date: 08/04/2022 
 """
 
-import pandas as pd
-from save_df import *
-from read_exo import getExo
+from astronavigation.save_df import *
+from astronavigation.read_exo import getExo
 from astropy import constants
 
 # Define constants

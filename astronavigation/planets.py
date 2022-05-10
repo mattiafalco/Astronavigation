@@ -6,10 +6,9 @@ Date: 23/03/2022
 """
 
 import numpy as np
-from astropy import constants
 from astropy.time import Time
 from calcephpy import *
-from deflection import quadru
+from astronavigation.deflection import quadru
 
 
 def read_from_INPOP(pl, date):
@@ -46,7 +45,7 @@ def read_from_INPOP(pl, date):
     if pl not in dic:
         raise ValueError(f'{pl} is not an implemented body.')
 
-    peph = CalcephBin.open("inpop21a_TCB_m1000_p1000_tcg.dat")
+    peph = CalcephBin.open("astronavigation/inpop21a_TCB_m1000_p1000_tcg.dat")
     t = Time(date, format='isot', scale='utc')
     jd0 = t.jd  # -2400000.5 - 51544.5
     dt = 0.0

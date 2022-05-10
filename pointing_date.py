@@ -1,10 +1,9 @@
-import numpy as np
-from deflection import *
+from astronavigation.deflection import *
 from astropy import constants
-from planets import Body, SolarSystem
+from astronavigation.planets import SolarSystem
 import pandas as pd
-from read_exo import getExo
-from save_df import save_df
+from astronavigation.read_exo import getExo
+from astronavigation.save_df import save_df
 import matplotlib.pyplot as plt
 
 
@@ -37,7 +36,7 @@ targets = ['Proxima Cen b', 'Kepler-220 b', 'Kepler-847 b', 'Kepler-288 b', 'OGL
            'GJ 1252 b', 'HR 858 c', 'WASP-84 b', 'K2-80 b', 'HAT-P-46 b']
 # date
 date_ref = np.datetime64('2122-01-01T12:00:00')
-month = 30  # set 0 to have only one date
+month = 0  # set 0 to have only one date
 
 #################
 #

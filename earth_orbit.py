@@ -5,10 +5,9 @@ Creator: Mattia Falco
 Date: 06/04/2022 
 """
 
-import numpy as np
-from deflection import *
+from astronavigation.deflection import *
 from astropy import constants
-from planets import Body, SolarSystem
+from astronavigation.planets import Body, SolarSystem
 import matplotlib.pyplot as plt
 
 # Define constants

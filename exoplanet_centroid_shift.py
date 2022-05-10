@@ -3,12 +3,9 @@
 Creator: mattia
 Date: 06/05/22.
 """
-import numpy as np
-import pandas as pd
-from read_exo import getExo, getExoAll
-from planets import SolarSystem, Body
+from astronavigation.planets import SolarSystem, Body
 from astropy import constants
-from deflection import *
+from astronavigation.deflection import *
 
 # Define constants
 pc = constants.pc.to('km').value

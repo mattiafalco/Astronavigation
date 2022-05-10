@@ -7,10 +7,9 @@ Date: 13/04/22
 
 import numpy as np
 import pandas as pd
-from read_exo import getExo, getExoAll
-from planets import SolarSystem, Body
+from astronavigation.planets import SolarSystem, Body
 from astropy import constants
-from deflection import deflection_mod
+from astronavigation.deflection import deflection_mod
 
 # Define constants
 pc = constants.pc.to('km').value

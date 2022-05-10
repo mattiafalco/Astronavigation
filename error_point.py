@@ -1,10 +1,9 @@
-import numpy as np
-from deflection import *
+from astronavigation.deflection import *
 from astropy import constants
-from planets import Body, SolarSystem
+from astronavigation.planets import SolarSystem
 import pandas as pd
-from read_exo import getExo
-from save_df import save_df
+from astronavigation.read_exo import getExo
+from astronavigation.save_df import save_df
 
 # Define constants
 pc = constants.pc.to('km').value
@@ -138,3 +137,4 @@ for x in x_stars:
 
 
 print(np.rad2deg(4*ss.getPlanet('jupiter').mass/c**2/ss.getPlanet('jupiter').radius)*3600*1e6)
+

@@ -1,7 +1,6 @@
-import numpy as np
-from deflection import *
+from astronavigation.deflection import *
 from astropy import constants
-from planets import Body, SolarSystem
+from astronavigation.planets import SolarSystem
 
 # Define constants
 pc = constants.pc.to('km').value

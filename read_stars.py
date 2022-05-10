@@ -5,12 +5,11 @@ Creator: Mattia Falco
 Date: 21/04/2022
 """
 
-import numpy as np
-from deflection import *
+from astronavigation.deflection import *
 from astropy import constants
-from planets import Body, SolarSystem
+from astronavigation.planets import Body, SolarSystem
 import pandas as pd
-from save_df import save_df
+from astronavigation.save_df import save_df
 
 # save parameter
 save = True
