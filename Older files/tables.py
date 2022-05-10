@@ -15,7 +15,7 @@ c = constants.c.to('km/s').value
 eps = 1/c
 
 # read exo catalogue
-path = 'exo_archive.csv'
+path = '../exo_archive.csv'
 catalogue = pd.read_csv(path)
 
 targets = ['Proxima Cen b', 'Kepler-220 b', 'Kepler-847 b', 'Kepler-288 b', 'OGLE-2015-BLG-0966L b',

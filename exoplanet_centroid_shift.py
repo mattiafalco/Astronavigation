@@ -1,4 +1,5 @@
-""" Description
+""" This program computes the centroid shift of a target star due to an exoplanet
+orbiting around it.
 
 Creator: mattia
 Date: 06/05/22.
