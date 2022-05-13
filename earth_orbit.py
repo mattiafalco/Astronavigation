@@ -24,9 +24,11 @@ eps = 1/c
 ######################################
 
 # black hole
-bh = Body(mass=7.1*GM_sun,
-          pos=np.array([-4, -1580, -45])*pc,
-          vel=np.array([0, 0, 0]))#np.array([3, 0, 40]))
+# bh = Body(mass=7.1*GM_sun,
+#           pos=np.array([-4, -1580, -45])*pc,
+#           vel=np.array([0, 0, 0]))#np.array([3, 0, 40]))
+bh = Body(mass=7*GM_sun,
+          pos=np.array([0, 1, 0])*1000*pc)
 
 # observer
 obs = 'earth'
@@ -36,7 +38,7 @@ list_p =['sun', 'jupiter', 'saturn']
 dist = 3000*pc
 
 # Time
-t_span = np.arange(0, 1*365)  # day
+t_span = np.arange(0, 2*365)  # day
 
 #################
 #

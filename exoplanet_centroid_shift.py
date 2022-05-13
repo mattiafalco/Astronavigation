@@ -19,7 +19,7 @@ ss = SolarSystem()
 jupiter = ss.getPlanet('jupiter')
 
 # target
-dist = 1 * pc
+dist = 10 * pc
 x = np.array([0, 1, 0])*dist
 
 # exoplanet
@@ -44,7 +44,7 @@ x = -np.linalg.norm(x - x_obs) * l0 + x_obs
 # centroid shift
 # use cs_beta and not centroid_shift because numerical precision
 # pushes the value of beta to zero
-dte = cs_beta(3, np.linalg.norm(x - x_obs), 4 * np.linalg.norm(x - pl.pos), chi)
+dte = cs_beta(1, np.linalg.norm(x - x_obs), 4 * np.linalg.norm(x - pl.pos), chi)
 
 print('\n-------------------------------')
 print(f'centroid shift: {np.rad2deg(dte)*3600*1e6} muas')
