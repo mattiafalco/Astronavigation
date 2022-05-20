@@ -666,6 +666,128 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
     return dtheta * theta_e
 
 
+
+def deflection_mod2(l0, x, x_a, x_obs, eps, v, M,
+               s=np.array([0, 0, 0]), J2=0, R=0):
+    """
+    Evaluate  the difference between the unperturbed direction l0 and the perturbed direction. If one of the last three
+    parameters is set to its default value it evaluates the monopole contribution whereas it evaluates only the
+    quadrupole contribution.
+
+    Parameters
+    ----------
+    l0 : np.ndarray
+        unperturbed direction
+    x : np.ndarray
+        source position (in km)
+    x_a : np.ndarray
+        mass position (in km)
+    x_obs : np.ndarray
+        observer position (in km)
+    eps : float
+        small parameter, usually 1/c (in s/km)
+    v : np.ndarray
+        mass velocity (in km/s)
+    M : float
+        mass parameter m*G (in km3/s2)
+    s : np.ndarray
+        rotation vector (default is [0,0,0])
+    J2 : float
+        oblateness parameter (default is 0)
+    R : float
+        mass radius (in km, default is 0)
+
+    Returns
+    -------
+    np.ndarray
+        perturbation on the direction of observation
+    """
+    # debug parameter, if true print some information
+    debug = False
+
+    # evaluate distance mass-source
+    r = x - x_a
+    # evaluate distance mass-observer
+    r_obs = x_obs - x_a
+
+    # evaluate vector norm
+    r_norm = np.linalg.norm(r)
+    r_obs_norm = np.linalg.norm(r_obs)
+
+    # evaluate normal vectors
+    n = r / r_norm
+    n_obs = r_obs / r_obs_norm
+
+    # evaluate parameters
+    sigma = np.dot(x - x_obs, l0)
+    d = r_obs - l0 * np.dot(r_obs, l0)
+    # d2 = r_obs_norm**2 - (np.dot(r_obs, l0))**2
+    d2 = np.linalg.norm(d) ** 2
+    dv = np.cross(l0, np.cross(v, l0))
+
+    if debug:
+        print(f'r_obs: {r_obs} km\n'
+              f'r_obs_norm: {r_obs_norm} km\n'
+              f'r_obs*l0: {np.dot(r_obs, l0)} \n'
+              f'd: {d}')
+        print(f'd = {np.sqrt(d2)} km')
+
+    if np.all(s == 0) and J2 == 0 and R == 0:
+
+        # evaluate useful combinations
+        p1 = 1 / r_norm - 1 / r_obs_norm
+        p2 = l0 - 2 * eps * (2 * dv - d * np.dot(v, r_obs) / d2)
+        p3 = 2 * d * ((1 - 2 * eps * np.dot(v, l0)) * (np.dot(n, l0) - np.dot(n_obs, l0))) / d2
+        p4 = r_obs_norm * (dv - 2 * d * np.dot(v, d) / d2) / (d2 * r_norm)
+        p5 = r_norm - r_obs_norm - np.dot(n_obs, l0) * sigma
+
+        if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4 * p5}')
+
+        # evaluate deflection
+        dl = -M * eps ** 2 * (p1 * p2 + p3) + 2 * M * (eps ** 3) * p4 * p5
+
+        if debug: print(f'dl: {dl}')
+
+        return dl
+    else:
+        # define three ON vectors
+        n = -d / np.linalg.norm(d)
+        t = l0
+        m = np.cross(t, n)
+
+        # # evaluate useful combinations
+        # p2 = (((J2*R**2)/d2) * (1 - np.dot(s, t)**2 - 2*np.dot(s, n)**2))*n
+        # p3 = (((J2*R**2)/d2)*np.dot(s, m)*np.dot(s, n))*m
+        #
+        # # evaluate deflection
+        # dl = ((4*M*eps**2)/np.sqrt(d2))*(p2 + p3)
+
+        # evaluate chi
+        chi = np.arccos(np.dot(x - x_obs, x_a - x_obs) / (np.linalg.norm(x - x_obs) * np.linalg.norm(x_a - x_obs)))
+
+        # evaluate useful combinations
+        p1 = 1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+        p2 = -2 * (1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+                   + 3 / 4 * np.cos(chi) * np.sin(chi) ** 4) * np.dot(n, s) ** 2
+        p3 = (np.sin(chi) ** 3 - 3 * np.sin(chi) ** 5) * np.dot(n, s) * np.dot(t, s)
+        p4 = -(1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2
+               - 3 / 2 * np.cos(chi) * np.sin(chi) ** 4) * np.dot(t, s) ** 2
+        p5 = 2 * (1 + np.cos(chi) + 0.5 * np.cos(chi) * np.sin(chi) ** 2) * np.dot(n, s) * np.dot(m, s)
+        p6 = np.sin(chi) ** 3 * np.dot(m, s) * np.dot(t, s)
+
+        # evaluate deflection
+        mono = 0  # 1+np.cos(chi)
+        # dl = (2 * M * eps ** 2 / np.sqrt(d2)) * (J2 * R ** 2 / d2) * ((p1 + p2 + p3 + p4) * n + (p5 + p6) * m)
+        dphi_1 = (2 * M * eps ** 2 / np.sqrt(d2)) * (mono+(J2 * R ** 2 / d2) * (p1 + p2 + p3 + p4))
+        dphi_2 = (2 * M * eps ** 2 / np.sqrt(d2)) * (J2 * R ** 2 / d2) * (p5 + p6)
+
+        if debug: print(f'd = {np.sqrt(d2)}')
+        print(f'b: {np.rad2deg(np.sqrt(d2)/np.linalg.norm(x_a - x_obs))*3600/20}')
+        print(f'b: {np.rad2deg(chi) * 3600 / 20}')
+
+        return dphi_1, dphi_2
+
+
 if __name__ == "__main__":
     AU = 149597870.691  # [km]
     pc = 3.0856775814672e13  # [km]
