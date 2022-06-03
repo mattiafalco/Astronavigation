@@ -855,10 +855,6 @@ def deflection_mod3(l0, x_a, eps, M,
         dphi_1 = (2 * M * eps ** 2 / np.sqrt(d2)) * (mono+(J2 * R ** 2 / d2) * (p1 + p2 + p3 + p4))
         dphi_2 = (2 * M * eps ** 2 / np.sqrt(d2)) * (J2 * R ** 2 / d2) * (p5 + p6)
 
-        if debug: print(f'd = {np.sqrt(d2)}')
-        print(f'b: {np.rad2deg(np.sqrt(d2)/np.linalg.norm(x_a - x_obs))*3600/20}')
-        print(f'b: {np.rad2deg(chi) * 3600 / 20}')
-
         return dphi_1, dphi_2
 
 if __name__ == "__main__":
