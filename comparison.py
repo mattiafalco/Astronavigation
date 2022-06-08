@@ -42,7 +42,7 @@ r_jup = ss.getPlanet('jupiter').radius
 J2_jup = ss.getPlanet('jupiter').J2
 
 # save parameter
-save = True
+save = False
 
 ######################################
 #

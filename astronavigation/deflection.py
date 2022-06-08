@@ -788,6 +788,17 @@ def deflection_mod2(l0, x, x_a, x_obs, eps, v, M,
         return dphi_1, dphi_2
 
 
+def on_triplet(l0, x_a):
+
+    d = x_a - l0 * np.dot(x_a, l0)
+
+    n = d / np.linalg.norm(d)
+    t = -l0
+    m = np.cross(n, t)
+
+    return t, n, m
+
+
 def deflection_mod3(l0, x_a, eps, M,
                s=np.array([0, 0, 1]), J2=0, R=0):
     """
@@ -824,20 +835,20 @@ def deflection_mod3(l0, x_a, eps, M,
     cos_chi = np.dot(x_a, l0)/np.linalg.norm(x_a)
     sin_chi = np.linalg.norm(np.cross(x_a, l0))/np.linalg.norm(x_a)
 
+    if debug: print(f'chi: {np.rad2deg(np.arccos(cos_chi))*3600/20}')
+
     if J2 == 0 and R == 0:
 
         # evaluate deflection
         mono = 1 + cos_chi
         dl = (2 * M * eps ** 2 / np.sqrt(d2)) * mono
 
-        if debug: print(f'dl: {dl}')
-
         return dl
     else:
         # define three ON vectors
-        n = -d / np.linalg.norm(d)
-        t = l0
-        m = np.cross(t, n)
+        n = d / np.linalg.norm(d)
+        t = -l0
+        m = np.cross(n, t)
 
         # evaluate useful combinations
         p1 = 1 + cos_chi + 0.5 * cos_chi * sin_chi ** 2
