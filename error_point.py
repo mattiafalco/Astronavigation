@@ -17,6 +17,7 @@ data = pd.read_csv(path)
 
 # save parameter
 save = False
+save_latex = True
 
 ######################################
 #
@@ -27,9 +28,9 @@ save = False
 # angle of observation
 g = -np.pi/2
 # masses
-list_p = ['sun', 'earth', 'jupiter', 'saturn', 'uranus', 'neptune']
+list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # targets
-targets = ['Proxima Cen b', 'K2-100 b', 'Kepler-943 b']
+targets = ['Proxima Cen b']#, 'K2-100 b', 'Kepler-943 b']
 dist = np.array([getExo(pl, data).dist for pl in targets])
 # dist = np.array([1.3012, 188, 2300])*pc
 
@@ -43,7 +44,7 @@ dist = np.array([getExo(pl, data).dist for pl in targets])
 ss = SolarSystem()
 
 # observer
-x_obs = (AU+380000)*np.array([np.cos(g), np.sin(g), 0])
+x_obs = (AU)*np.array([np.cos(g), np.sin(g), 0])
 
 # take bodies which generate grav. field
 # planets = [ss.getPlanet(pl) for pl in list_p]
@@ -104,6 +105,18 @@ for x in x_stars:
         path = f'Data/max_errors_{np.round(np.linalg.norm(x) / pc, 4)}_pc'
         save_df(data, columns, rows, path)
 
+    if save_latex:
+        rows = list_p
+        columns = ['dl_vn', 'dl', 'dlt', 'dlt - sun', 'dr', 'dr - sun']
+        data = [np.round(np.rad2deg(dl2)*3600*1e6, 2),
+                np.round(np.rad2deg(dl1)*3600*1e6, 2),
+                np.round(np.rad2deg(dlt)*3600*1e6, 2),
+                np.round(np.rad2deg(dlt-dlt[0])*3600*1e6, 2),
+                np.round(dr/AU, 2),
+                np.round((dr-dr[0])/AU, 2)]
+        path = f'Data/max_errors_latex'
+        save_df(data, columns, rows, path)
+
     # quadrupole jupiter-saturn
     list_q = ['jupiter', 'saturn', 'uranus', 'neptune']
     planets_q = [ss.getPlanet(pl) for pl in list_q]
@@ -118,7 +131,7 @@ for x in x_stars:
         x = -np.linalg.norm(x - x_obs) * l0q + x_obs
         # deflection
         dls = deflection(l0q, x, pl.pos, x_obs, eps, pl.vel, pl.mass,
-                         pl.s, pl.J2, pl.radius)
+                         np.array([0, 0, 1]), pl.J2, pl.radius)
         dl_q.append(np.linalg.norm(dls))
     dlt_q = np.cumsum(np.array(dl_q))
     dr_q = np.linalg.norm(x-x_obs)*dlt_q
@@ -133,6 +146,15 @@ for x in x_stars:
                 np.rad2deg(dlt_q) * 3600 * 1e6,
                 dr_q / AU]
         path = f'Data/max_errors_quad_{np.round(np.linalg.norm(x) / pc, 4)}_pc'
+        save_df(data, columns, rows, path)
+
+    if save_latex:
+        rows = list_q
+        columns = ['dl', 'dlt', 'dr']
+        data = [np.round(np.rad2deg(dl_q) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dlt_q) * 3600 * 1e6, 2),
+                np.round(dr_q / AU, 2)]
+        path = f'Data/max_errors_quad_latex'
         save_df(data, columns, rows, path)
 
 

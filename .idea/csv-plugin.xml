@@ -24,7 +24,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/comparison_d1.0pc_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/comparison_d10.0pc.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/comparison_d10.0pc_latex.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -45,7 +59,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/comparison_d1000.0pc_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/comparison_d2000.0pc.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/comparison_d2000.0pc_latex.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -101,6 +129,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/max_errors_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/max_errors_quad_1.3012_pc.csv">
           <value>
             <Attribute>
@@ -122,7 +157,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/max_errors_quad_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/parallax1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/parallax1_latex.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

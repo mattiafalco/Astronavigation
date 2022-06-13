@@ -43,6 +43,7 @@ J2_jup = ss.getPlanet('jupiter').J2
 
 # save parameter
 save = False
+save_latex = True
 
 ######################################
 #
@@ -65,17 +66,17 @@ list_exo = ['bh_7m', 'bh_20m', 'pl_1j']
 bh_7m = Body(mass=7*m_sun,
              pos=np.array([0, 3, 0])*pc,
              radius=r_jup,
-             J2=J2_jup)
+             J2=20*r_sun/r_jup*J2_jup)
 
 bh_20m = Body(mass=20*m_sun,
-              pos=np.array([0, 1, 0])*pc,
+              pos=np.array([0, 3, 0])*pc,
               radius=r_jup,
-              J2=J2_jup)
+              J2=20*r_sun/r_jup*J2_jup)
 
 pl_1j = Body(mass=3*m_jup,
              pos=np.array([0, 8, 0])*pc,
              radius=r_jup,
-             J2=J2_jup)
+             J2=3*J2_jup)
 
 worm_1j = Body(mass=0,
                pos=np.array([0, 1, 0])*pc,
@@ -105,6 +106,7 @@ for pl in list_p:
     planets.append(ss.getPlanet(pl, anom=anom))
 
 v_null = np.array([0, 0, 0])
+s_test = np.array([0, 0, 1])
 
 # add exos
 planets += exos
@@ -151,7 +153,7 @@ for x in x_stars:
         dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
         dl2.append(np.linalg.norm(dls))
         # deflection quadrupole
-        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, pl.s, pl.J2, pl.radius)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, s_test, pl.J2, pl.radius)
         dlq.append(np.linalg.norm(dls))
         # deflection Erez-Rosen
         dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, c1=False, quad=False)
@@ -173,8 +175,8 @@ for x in x_stars:
     chi = 1 * np.cbrt(np.pi / 4 * np.linalg.norm(x - worm_1j.pos) * worm_1j.radius ** 2
                   / (np.linalg.norm(x - x_obs) * np.linalg.norm(worm_1j.pos - x_obs) ** 2))
     l0 = -np.array([np.sin(chi), np.cos(chi), 0])
-    x = worm_1j.dist * l0 + x_obs
-    dls = ellis_deflection(l0, x, worm_1j.pos, x_obs, worm_1j.radius)
+    x_el = worm_1j.dist * l0 + x_obs
+    dls = ellis_deflection(l0, x_el, worm_1j.pos, x_obs, worm_1j.radius)
     # print(f'd: {chi*np.linalg.norm(worm_1j.pos - x_obs)} km')
 
     print(f'\n---------------------------------\nexoplanet at {np.linalg.norm(x)/pc} pc')
@@ -205,5 +207,19 @@ for x in x_stars:
         path = f'Data/comparison_d{np.round(np.linalg.norm(x)/pc, 4)}pc'
         save_df(data, columns, rows, path)
 
-
+    # saving
+    if save_latex:
+        rows = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune', 'bh $7m_\odot$', 'bh $20m_\odot$', 'pl $3m_J$']
+        columns = ['dl_vn', 'dl', 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
+        data = [np.round(np.rad2deg(dl2) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dl1) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dl_er) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dl_er_c1) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dlq) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dlq_er) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dlq_er_c2) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(cs) * 3600 * 1e6, 2)]
+        path = f'Data/comparison_d{np.round(np.linalg.norm(x) / pc, 1)}pc_latex'
+        print(path)
+        save_df(data, columns, rows, path)
 

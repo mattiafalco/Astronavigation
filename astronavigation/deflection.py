@@ -626,7 +626,7 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
 
     """
     # debug parameter
-    debug = True
+    debug = False
 
     # distances
     dl = np.linalg.norm(x_a - x_obs)

@@ -35,7 +35,7 @@ positions = [0, np.pi]
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 
 # targets
-dist = 10000 * pc
+dist = 1.3012 * pc
 
 #################
 #
@@ -115,16 +115,19 @@ for g in positions:
     # saving
     if save:
         rows = list_p
-        columns = ['dl_vn', 'dl', 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
-        data = [np.rad2deg(dl2) * 3600 * 1e6,
-                np.rad2deg(dl1) * 3600 * 1e6,
-                np.rad2deg(dl_er) * 3600 * 1e6,
-                np.rad2deg(dl_er_c1) * 3600 * 1e6,
-                np.rad2deg(dlq) * 3600 * 1e6,
-                np.rad2deg(dlq_er) * 3600 * 1e6,
-                np.rad2deg(dlq_er_c2) * 3600 * 1e6,
-                np.rad2deg(cs) * 3600 * 1e6]
-        path = f'Data/parallax{count}'
+        columns = ['dl_vn', 'dlt-sun'] # , 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
+        # data = [np.rad2deg(dl2) * 3600 * 1e6,
+        #         np.rad2deg(dl1) * 3600 * 1e6,
+        #         np.rad2deg(dl_er) * 3600 * 1e6,
+        #         np.rad2deg(dl_er_c1) * 3600 * 1e6,
+        #         np.rad2deg(dlq) * 3600 * 1e6,
+        #         np.rad2deg(dlq_er) * 3600 * 1e6,
+        #         np.rad2deg(dlq_er_c2) * 3600 * 1e6,
+        #         np.rad2deg(cs) * 3600 * 1e6]
+        data = [np.round(np.rad2deg(dl2) * 3600 * 1e6, 4),
+                np.round(np.rad2deg(np.cumsum(dl2)-dl2[0]) * 3600 * 1e6, 4),
+                ]
+        path = f'Data/parallax{count}_latex'
         save_df(data, columns, rows, path)
         count += 1
 
