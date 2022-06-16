@@ -19,7 +19,7 @@ catalogue = pd.read_csv(path)
 
 # save parameter
 save = False
-save_latex = True
+save_latex = False
 
 ######################################
 #
@@ -33,8 +33,8 @@ obs = 'earth'
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # targets
 targets = ['Proxima Cen b', 'Kepler-220 b', 'Kepler-847 b', 'Kepler-288 b', 'OGLE-2015-BLG-0966L b',
-           'OGLE-2014-BLG-0124L b', 'KMT-2016-BLG-2605L b', 'OGLE-2008-BLG-092L b',
-            'GJ 1252 b', 'HR 858 c', 'WASP-84 b', 'K2-80 b', 'HAT-P-46 b']
+           'OGLE-2014-BLG-0124L b', 'WASP-84 b'] #'KMT-2016-BLG-2605L b', 'OGLE-2008-BLG-092L b',
+           # 'GJ 1252 b', 'HR 858 c', 'K2-80 b', 'HAT-P-46 b']
 # date
 date_ref = np.datetime64('2122-01-01T12:00:00')
 month = 24  # set 0 to have only one date
@@ -224,17 +224,19 @@ dr_nosun_date = np.array(dr_nosun_date).T
 if len(dates) > 1:
     fig = plt.figure()
     ax = plt.axes()
-    ax.plot(dr_date[0]/AU)
+    ax.plot(dr_date[6]/AU)
 
     ax.set_xlabel('t [month]')
     ax.set_ylabel('dr [AU]')
+    plt.title('Sun pointing error')
 
     fig2 = plt.figure()
     ax2 = plt.axes()
-    ax2.plot(dr_nosun_date[0]/AU)
+    ax2.plot(dr_nosun_date[6]/AU)
 
     ax2.set_xlabel('t [month]')
     ax2.set_ylabel('dr [AU]')
+    plt.title('Planets pointing error')
 
     plt.show()
 
