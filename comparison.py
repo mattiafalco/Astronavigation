@@ -43,7 +43,7 @@ J2_jup = ss.getPlanet('jupiter').J2
 
 # save parameter
 save = False
-save_latex = True
+save_latex = False
 
 ######################################
 #
@@ -79,7 +79,7 @@ pl_1j = Body(mass=3*m_jup,
              J2=3*J2_jup)
 
 worm_1j = Body(mass=0,
-               pos=np.array([0, 1, 0])*pc,
+               pos=np.array([0, 3, 0])*pc,
                radius=r_jup)
 
 exos = [bh_7m, bh_20m, pl_1j]

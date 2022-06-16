@@ -94,6 +94,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/ellis_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/jupiter4_deflections.csv">
           <value>
             <Attribute>
@@ -185,7 +192,70 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/pointing_date_Kepler-220 b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_Kepler-288 b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_Kepler-847 b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_OGLE-2008-BLG-092L b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_OGLE-2014-BLG-0124L b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_OGLE-2015-BLG-0966L b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_Proxima Cen b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_WASP-84 b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/pointing_errors_1996-02-25T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_GJ 1252 b_2122-01-01T12:00:00.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -200,6 +270,13 @@
           </value>
         </entry>
         <entry key="/Data/pointing_errors_HR 858 c_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_K2-80 b_2122-01-01T12:00:00.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -256,6 +333,13 @@
           </value>
         </entry>
         <entry key="/Data/pointing_errors_Proxima Cen b_2122-01-01T12:00:00.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_errors_WASP-84 b_2122-01-01T12:00:00.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

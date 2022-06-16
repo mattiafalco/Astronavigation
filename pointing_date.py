@@ -19,6 +19,7 @@ catalogue = pd.read_csv(path)
 
 # save parameter
 save = False
+save_latex = True
 
 ######################################
 #
@@ -33,10 +34,10 @@ list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 # targets
 targets = ['Proxima Cen b', 'Kepler-220 b', 'Kepler-847 b', 'Kepler-288 b', 'OGLE-2015-BLG-0966L b',
            'OGLE-2014-BLG-0124L b', 'KMT-2016-BLG-2605L b', 'OGLE-2008-BLG-092L b',
-           'GJ 1252 b', 'HR 858 c', 'WASP-84 b', 'K2-80 b', 'HAT-P-46 b']
+            'GJ 1252 b', 'HR 858 c', 'WASP-84 b', 'K2-80 b', 'HAT-P-46 b']
 # date
 date_ref = np.datetime64('2122-01-01T12:00:00')
-month = 0  # set 0 to have only one date
+month = 24  # set 0 to have only one date
 
 #################
 #
@@ -167,6 +168,20 @@ for date in dates:
                     index=index,
                     path=path)
 
+        if save_latex:
+            columns = ['dl_vn', 'dl', 'dlt', 'dlt - sun', 'dr', 'dr - sun']
+            index = list_p
+            path = f'Data/pointing_date_{target}_latex'
+            save_df([np.round(np.rad2deg(dl2)*3600*1e6, 2),
+                     np.round(np.rad2deg(dl1) * 3600 * 1e6, 2),
+                     np.round(np.rad2deg(dlt)*3600*1e6, 2),
+                     np.round(np.rad2deg(dlt-dlt[0])*3600*1e6, 2),
+                     np.round(dr/AU, 4),
+                     np.round((dr-dr[0])/AU, 4)],
+                    columns=columns,
+                    index=index,
+                    path=path)
+
         # save dr
         dr_temp.append(dr[-1])
         dr_nosun_temp.append(dr[-1]-dr[0])
@@ -193,6 +208,10 @@ for date in dates:
             l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
             ax.plot(l0[0] * 50, l0[1] * 50, l0[2] * 50, label=target, marker='*')
         plt.legend(loc=(1.05, 0.3), fontsize='xx-small')
+        plt.title('Solar System, 01/01/2122')
+        ax.set_xlabel('x [AU]')
+        ax.set_ylabel('y [AU]')
+        ax.set_zlabel('z [AU]')
         plt.show()
 
 dr_date = np.array(dr_date).T
@@ -205,11 +224,17 @@ dr_nosun_date = np.array(dr_nosun_date).T
 if len(dates) > 1:
     fig = plt.figure()
     ax = plt.axes()
-    ax.plot(dr_date[7]/AU)
+    ax.plot(dr_date[0]/AU)
+
+    ax.set_xlabel('t [month]')
+    ax.set_ylabel('dr [AU]')
 
     fig2 = plt.figure()
     ax2 = plt.axes()
-    ax2.plot(dr_nosun_date[7]/AU)
+    ax2.plot(dr_nosun_date[0]/AU)
+
+    ax2.set_xlabel('t [month]')
+    ax2.set_ylabel('dr [AU]')
 
     plt.show()
 
