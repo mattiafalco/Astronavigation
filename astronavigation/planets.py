@@ -109,6 +109,22 @@ class Body(object):
 
         return str
 
+    def set_Pos(self, new_pos):
+        """
+        reset body position
+
+        Parameters
+        ----------
+        new_pos: np.ndarray
+
+        Returns
+        -------
+        None
+
+        """
+        self.pos = new_pos
+        self.dist = np.linalg.norm(new_pos)
+
 
 class SolarSystem(object):
     """

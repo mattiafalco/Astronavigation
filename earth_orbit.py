@@ -33,7 +33,7 @@ bh = Body(mass=7*GM_sun,
 # observer
 obs = 'earth'
 # masses
-list_p =['sun', 'jupiter', 'saturn']
+list_p = ['sun', 'jupiter', 'saturn']
 # target
 dist = 3000*pc
 
@@ -91,7 +91,7 @@ for t in t_span:
     for planet in list_p:
 
         if planet != 'sun':
-            anom_p = ss.getPlanet(planet).speed/ss.getPlanet(planet).dist * t * 24 * 3600
+            anom_p = ss.getPlanet(planet).speed/ss.getPlanet(planet).dist * t * 24 * 3600 + np.pi/2+np.pi/200
         else:
             anom_p = 0
 
@@ -164,10 +164,12 @@ fig4 = plt.figure()
 ax4 = plt.axes(projection='3d')
 ax4.plot(0.0, 0.0, 0.0, marker='^', color='blue', label='sun')
 for pl in ['earth', 'jupiter', 'saturn']:
-    x_p = ss.getPlanet(pl, anom=0).pos
+    anom = 0 if pl == 'earth' else np.pi/2+np.pi/200
+    x_p = ss.getPlanet(pl, anom=anom).pos
     ax4.plot(x_p[0], x_p[1], x_p[2], label=pl, marker='o')
-ax4.plot(ll[0]*10*AU, ll[1]*10*AU, ll[2]*10*AU, label='bh', marker='o')
+ax4.plot(ll[0]*15*AU, ll[1]*15*AU, ll[2]*15*AU, label='bh', marker='+')
 plt.legend()
+plt.xlim((-1e9, 1e9))
 
 
 plt.show()

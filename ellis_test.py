@@ -4,8 +4,6 @@ Creator: mattiafalco
 date: 15/06/22
 """
 
-
-
 from astronavigation.deflection import *
 from astropy import constants
 from astronavigation.planets import Body, SolarSystem
@@ -74,7 +72,7 @@ for body in worms:
     # ellis wormhole deflection
     chi = 1 * np.cbrt(np.pi / 4 * np.linalg.norm(x - body.pos) * body.radius ** 2
                   / (np.linalg.norm(x - x_obs) * np.linalg.norm(body.pos - x_obs) ** 2))
-    l0 = -np.array([np.sin(chi), np.cos(chi), 0])
+    l0 = np.array([np.sin(chi), np.cos(chi), 0])
     x_el = body.dist * l0 + x_obs
     dls = ellis_deflection(l0, x_el, body.pos, x_obs, body.radius)
     dl.append(dls)
