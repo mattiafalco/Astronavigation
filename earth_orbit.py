@@ -82,7 +82,7 @@ for t in t_span:
     dl1 = []
 
     # bh deflection
-    dls = deflection(l0, x, bh.pos, x_obs, eps, bh.vel, bh.mass)
+    dls = deflection(l0, x, bh.pos, x_obs, eps, bh.mass, bh.vel)
     dl1.append(np.linalg.norm(dls))
 
     dl_dict['bh'].append(np.linalg.norm(dls))
@@ -96,7 +96,7 @@ for t in t_span:
             anom_p = 0
 
         pl = ss.getPlanet(planet, anom=anom_p)
-        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.vel)
         dl1.append(np.linalg.norm(dls))
         dl_dict[planet].append(np.linalg.norm(dls))
 

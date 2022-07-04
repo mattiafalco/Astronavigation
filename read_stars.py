@@ -102,7 +102,7 @@ for pl_name, pl in zip(list_p, bodies):
         l0 = -(x - x_obs) / np.linalg.norm(x - x_obs)
 
         # deflection
-        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, v_null)
         dl1.append(np.linalg.norm(dls))
 
     if save:

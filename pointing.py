@@ -46,7 +46,7 @@ planets = [ss.getPlanet(pl) for pl in list_p]
 dl1 = []
 dpsi = []
 for pl in planets:
-    dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
+    dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.vel)
     # dls = deflection(l0, x, pl.pos, x_obs, eps, np.array([0,0,0]), pl.mass)
     dl1.append(np.linalg.norm(dls))
     dln = dls - l0*np.dot(dls, l0)

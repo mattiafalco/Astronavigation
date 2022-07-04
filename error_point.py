@@ -75,10 +75,10 @@ for x in x_stars:
         l0 = -np.array([np.sin(chi), np.cos(chi), 0])
         x = -np.linalg.norm(x - x_obs)*l0 + x_obs
         # deflection
-        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.vel)
         dl1.append(np.linalg.norm(dls))
         # deflection w/ null velocities
-        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, v_null)
         dl2.append(np.linalg.norm(dls))
 
     dlt = np.cumsum(dl1)

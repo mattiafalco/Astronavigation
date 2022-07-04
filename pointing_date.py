@@ -96,11 +96,11 @@ for date in dates:
 
         for pl in planets:
             # monopole deflection
-            dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
+            dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.vel)
             # monopole deflection w/ null vel
-            dls_vn = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
+            dls_vn = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, v_null)
             # quadrupole deflection
-            dlq = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass, pl.s, pl.J2, pl.radius)
+            dlq = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.vel, pl.s, pl.J2, pl.radius)
 
             # save norm values in lists
             dl1.append(np.linalg.norm(dls))

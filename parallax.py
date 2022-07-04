@@ -77,26 +77,26 @@ for g in positions:
         l0 = -(x-x_obs)/np.linalg.norm(x-x_obs)
 
         # deflection
-        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.vel)
         dl1.append(np.linalg.norm(dls))
         # deflection w/ null velocities
-        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, v_null)
         dl2.append(np.linalg.norm(dls))
         print(dls)
         # deflection quadrupole
-        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, pl.s, pl.J2, pl.radius)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, v_null, pl.s, pl.J2, pl.radius)
         dlq.append(np.linalg.norm(dls))
         # deflection Erez-Rosen
-        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, c1=False, quad=False)
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, J2=pl.J2, R=pl.radius, c1=False, quad=False)
         dl_er.append(np.linalg.norm(dls))
         # deflection Erez-Rosen monopole correction
-        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, quad=False)
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, J2=pl.J2, R=pl.radius, quad=False)
         dl_er_c1.append(np.linalg.norm(dls))
         # deflection quadrupole Erez-Rosen
-        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius, c2=False)
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, J2=pl.J2, R=pl.radius, c2=False)
         dlq_er.append(np.linalg.norm(dls) - dl_er_c1[-1])  # subtract the monopole contribution
         # deflection quadrupole correction Erez-Rosen
-        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius)
+        dls = er_deflection(l0, x, pl.pos, x_obs, eps, pl.mass, J2=pl.J2, R=pl.radius)
         dlq_er_c2.append(np.linalg.norm(dls) - dl_er_c1[-1])  # subtract the monopole contribution
         # centroid shift
         delta = centroid_shift(x, pl.pos, x_obs, eps, pl.mass, pl.J2, pl.radius)

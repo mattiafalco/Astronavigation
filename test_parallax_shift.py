@@ -81,15 +81,15 @@ for x in x_stars:
         l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
 
         # deflection w/ null velocities
-        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, v_null)
         dl1.append(np.linalg.norm(dls))
         par1.append(parallax_shift(dl1[-1], l0, x_obs))
         # deflection
-        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.vel, pl.mass)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.vel)
         dl2.append(np.linalg.norm(dls))
         par2.append(parallax_shift(dl2[-1], l0, x_obs))
         # quadrupole
-        dls = deflection(l0, x, pl.pos, x_obs, eps, v_null, pl.mass, pl.s, pl.J2, pl.radius)
+        dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, v_null, pl.s, pl.J2, pl.radius)
         dlq.append(np.linalg.norm(dls))
         parq.append(parallax_shift(dlq[-1], l0, x_obs))
 

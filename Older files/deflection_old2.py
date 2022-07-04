@@ -156,35 +156,9 @@ def rad2muas(rad):
 
     return np.rad2deg(rad)*3600e6
 
-
-def on_triplet(l0, x_a):
-    """ Evaluates three ON vectors given the direction of a source and the position of a lens.
-
-    Parameters
-    ----------
-    l0 : np.ndarray
-        source direction
-    x_a : np.ndarray
-        lens position
-
-    Returns
-    -------
-    t, n, m : list
-        list of np.ndarray
-    """
-
-    d = x_a - l0 * np.dot(x_a, l0)
-
-    n = d / np.linalg.norm(d)
-    t = -l0
-    m = np.cross(n, t)
-
-    return t, n, m
-
-
 #########################
 #
-# Light deflection formulas
+# Main functions
 #
 #########################
 
@@ -399,15 +373,8 @@ def Ellis_formula(b, a):
 
     return dl
 
-
-#########################
-#
-# general functions
-#
-#########################
-
-def deflection(l0, x, x_a, x_obs, eps, M, v=np.array([0,0,0]),
-               s=np.array([0, 0, 1]), J2=0, R=0):
+def deflection(l0, x, x_a, x_obs, eps, v, M,
+               s=np.array([0, 0, 0]), J2=0, R=0):
     """
     Evaluate  the difference between the unperturbed direction l0 and the perturbed direction. If one of the last three
     parameters is set to its default value it evaluates the monopole contribution whereas it evaluates only the
@@ -593,7 +560,7 @@ def dx(l_obs, l0, x, x_a, x_obs, eps, v, M):
     return deltax
 
 
-def er_deflection(l0, x, x_a, x_obs, eps, M, v=[0,0,0], J2=0, R=0, s=[0,0,0], c1=True, c2=True, quad=True):
+def er_deflection(l0, x, x_a, x_obs, eps, M, J2, R, c1=True, c2=True, quad=True):
     """ Evaluate the light deflection of a Erez-Rosen blak hole. This function is valid only in grazing condition.
 
     Parameters
@@ -644,6 +611,23 @@ def er_deflection(l0, x, x_a, x_obs, eps, M, v=[0,0,0], J2=0, R=0, s=[0,0,0], c1
 
     return Erez_Rosen_formula(np.linalg.norm(d), eps, M, J2, R, c1, c2, quad)
 
+    # if debug: print(f'd: {np.linalg.norm(d)} km')
+    #
+    # # evaluate contributions
+    # p1 = 4 * M / np.sqrt(d2)
+    # p2 = (15 * np.pi * M ** 2) / (4 * d2) if c1 else 0
+    # if quad:
+    #     p3 = (4 * J2 * R ** 2 * M) / (np.sqrt(d2) ** 3)
+    #     p4 = (128 * M ** 3) / (3 * np.sqrt(d2) ** 3) if c2 else 0
+    # else:
+    #     p3 = 0
+    #     p4 = 0
+    #
+    # # evaluate deflection
+    # dl = eps ** 2 * p1 + eps ** 4 * p2 + eps ** 2 * p3 + eps ** 6 * p4
+    #
+    # return dl
+
 
 def ellis_deflection(l0, x, x_a, x_obs, a):
     """ Evaluate the light deflection of a Ellis wormhole.
@@ -684,6 +668,16 @@ def ellis_deflection(l0, x, x_a, x_obs, a):
 
     return Ellis_formula(d_norm, a)
 
+    # if debug: print(f'd: {np.linalg.norm(d)} km')
+    #
+    # # evaluate contributions
+    # p1 = (np.pi / 4) * a ** 2 / d2
+    #
+    # # evaluate deflection
+    # dl = p1
+    #
+    # return dl
+
 
 def cs_beta(beta, ds, dls, theta, q=0):
     """ This function evaluates the centroid shift of a source with a given value
@@ -720,7 +714,6 @@ def cs_beta(beta, ds, dls, theta, q=0):
     dtheta = p1 + p2 * xi + (beta / (beta ** 2 + 2) ** 2) * (p3 + p4 + p5 + p6) * xi ** 2
 
     return dtheta * theta
-
 
 def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
     """ This function evaluates the centroid shift of a source. It is valid only in grazing conditions, i.e.
@@ -790,48 +783,29 @@ def centroid_shift(x, x_a, x_obs, eps, M, J2, R):
     return dtheta * theta_e
 
 
-def deflection_mod2(l0, x, x_a, x_obs, eps, M,
-                J2=0, R=0, s=np.array([0, 0, 0]), v=[0,0,0]):
-    """ Evaluate the light deflection angle using Crosta-Mignard formula. If one of the last three
-        parameters is set to its default value it evaluates the monopole contribution whereas it evaluates only the
-        quadrupole contribution.
+def on_triplet(l0, x_a):
+    """ Evaluates three ON vectors given the direction of a source and the position of a lens.
 
-        Parameters
-        ----------
-        l0 : np.ndarray
-            unperturbed direction
-        x : np.ndarray
-            source position (in km)
-        x_a : np.ndarray
-            mass position (in km)
-        x_obs : np.ndarray
-            observer position (in km)
-        eps : float
-            small parameter, usually 1/c (in s/km)
-        M : float
-            mass parameter m*G (in km3/s2)
-        s : np.ndarray
-            rotation vector (default is [0,0,0])
-        J2 : float
-            oblateness parameter (default is 0)
-        R : float
-            mass radius (in km, default is 0)
+    Parameters
+    ----------
+    l0 : np.ndarray
+        source direction
+    x_a : np.ndarray
+        lens position
 
-        Returns
-        -------
-        float
-            perturbation on the direction of observation
-        """
-    # evaluate distance mass-source
-    r = x - x_a
-    # evaluate distance mass-observer
-    r_obs = x_obs - x_a
+    Returns
+    -------
+    t, n, m : list
+        list of np.ndarray
+    """
 
-    # evaluate parameters
-    d = r_obs - l0 * np.dot(r_obs, l0)
-    chi = np.arccos(np.dot(x - x_obs, x_a - x_obs) / (np.linalg.norm(x - x_obs) * np.linalg.norm(x_a - x_obs)))
+    d = x_a - l0 * np.dot(x_a, l0)
 
-    return CM_formula(l0, d, chi, M, eps, J2, R, s)
+    n = d / np.linalg.norm(d)
+    t = -l0
+    m = np.cross(n, t)
+
+    return t, n, m
 
 
 def deflection_mod3(l0, x_a, eps, M,
@@ -877,86 +851,114 @@ def deflection_mod3(l0, x_a, eps, M,
 
     return CM_formula(l0, d, chi, M, eps, J2, R, s)
 
-#########################
-#
-# Main function
-#
-#########################
+    # if J2 == 0 and R == 0:
+    #
+    #     # evaluate deflection
+    #     mono = 1 + cos_chi
+    #     dl = (2 * M * eps ** 2 / np.sqrt(d2)) * mono
+    #
+    #     return dl
+    # else:
+    #     # define three ON vectors
+    #     n = d / np.linalg.norm(d)
+    #     t = -l0
+    #     m = np.cross(n, t)
+    #
+    #     # evaluate useful combinations
+    #     p1 = 1 + cos_chi + 0.5 * cos_chi * sin_chi ** 2
+    #     p2 = -2 * (1 + cos_chi + 0.5 * cos_chi * sin_chi ** 2
+    #                + 3 / 4 * cos_chi * sin_chi ** 4) * np.dot(n, s) ** 2
+    #     p3 = (sin_chi ** 3 - 3 * sin_chi ** 5) * np.dot(n, s) * np.dot(t, s)
+    #     p4 = -(1 + cos_chi + 0.5 * cos_chi * sin_chi ** 2
+    #            - 3 / 2 * cos_chi * sin_chi ** 4) * np.dot(t, s) ** 2
+    #     p5 = 2 * (1 + cos_chi + 0.5 * cos_chi * sin_chi ** 2) * np.dot(n, s) * np.dot(m, s)
+    #     p6 = sin_chi ** 3 * np.dot(m, s) * np.dot(t, s)
+    #
+    #     # evaluate deflection
+    #     mono = 0  # 1+np.cos(chi)
+    #     # dl = (2 * M * eps ** 2 / np.sqrt(d2)) * (J2 * R ** 2 / d2) * ((p1 + p2 + p3 + p4) * n + (p5 + p6) * m)
+    #     dphi_1 = (2 * M * eps ** 2 / np.sqrt(d2)) * (mono+(J2 * R ** 2 / d2) * (p1 + p2 + p3 + p4))
+    #     dphi_2 = (2 * M * eps ** 2 / np.sqrt(d2)) * (J2 * R ** 2 / d2) * (p5 + p6)
+    #
+    #     return dphi_1, dphi_2
 
 
-METHODS = {'CM': deflection_mod2,
-           'RAMOD': deflection,
-           'ER': er_deflection}
-
-
-def light_defl(l0, x, x_a, x_obs, eps, M, v=np.array([0, 0, 0]),
-               s=np.array([0, 0, 1]), J2=0, R=0, method='CM', *args):
-    """
-       Evaluate  the difference between the unperturbed direction l0 and the perturbed direction. If J2 and R are
-       set to its default value it evaluates the monopole contribution whereas it evaluates only the
-       quadrupole contribution.
-
-       Parameters
-       ----------
-       l0 : np.ndarray
-           unperturbed direction
-       x : np.ndarray
-           source position (in km)
-       x_a : np.ndarray
-           mass position (in km)
-       x_obs : np.ndarray
-           observer position (in km)
-       eps : float
-           small parameter, usually 1/c (in s/km)
-       v : np.ndarray
-           mass velocity (in km/s), this parameter gives contribtion only with 'RAMOD'
-       M : float
-           mass parameter m*G (in km3/s2)
-       s : np.ndarray
-           rotation vector (default is [0,0,1])
-       J2 : float
-           oblateness parameter (default is 0)
-       R : float
-           mass radius (in km, default is 0)
-       method : str
-           method for evaluation of light deflection, default is Crosta-Mignard
-
-       Returns
-       -------
-       any
-           perturbation on the direction of observation
-       """
-
-    method = METHODS[method]
-
-    return method(l0, x, x_a, x_obs, eps, M, v=v, s=s, J2=J2, R=R, *args)
+def deflection_mod4(l0, x, x_a, x_obs, eps, v, M,
+               s=np.array([0, 0, 0]), J2=0, R=0, method='CM'):
+    pass
 
 
 if __name__ == "__main__":
+    AU = 149597870.691  # [km]
+    pc = 3.0856775814672e13  # [km]
+    c = 299792.458  # [km/s]
 
-    from planets import *
-    from astropy import constants
+    R = 71492
+    ang = 90
+    chi = np.deg2rad(ang)
+    star = 10 * pc
 
-    # Define constants
-    pc = constants.pc.to('km').value
-    AU = constants.au.to('km').value
-    c = constants.c.to('km/s').value
+    x_a = np.array([0, 5.2 * AU, 0])  # Jupiter
+    x_obs = np.array([0, AU + 1.5e6, 0])  # L2
+    x = np.array([star * np.sin(chi), AU + 1.5e6 + star * np.cos(chi), 0])
     eps = 1 / c
+    v = np.array([0, 0, 0])
+    MG = 1.26686534e8
+    l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
 
-    ss = SolarSystem()
-    jupiter = ss.getPlanet('jupiter')
+    print('\n--------------- test -------------\nmonopole deflection at chi = 90 deg')
+    dls = deflection(l0, x, x_a, x_obs, eps, v, MG)
+    # print(dls)
+    print(f'dl_n mono = {np.rad2deg((np.linalg.norm(dls))) * 3600 * 1e6} muas')
 
-    x = np.array([0, 1, 0])*pc
+    # print('\n--------------- test -------------\nquadrupole deflection at chi = 22 as')
+    #
+    # ang = 22/3600
+    # chi = np.deg2rad(ang)
+    # star = 1 * pc
+    #
+    # x_a = np.array([0, 5.2 * AU, 0])  # Jupiter
+    # x_obs = np.array([0, AU + 1.5e6, 0])  # L2
+    # x = np.array([star * np.sin(chi), AU + 1.5e6 + star * np.cos(chi), 0])
+    # eps = 1 / c
+    # v = np.array([0, 0, 0])
+    # MG = 1.26686534e8
+    # l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
+    #
+    # #print(f'exp_chi = {np.rad2deg(np.arcsin(R/(np.linalg.norm(x_obs-x_a))))*3600}')
+    # print(f'exp_chi = {np.rad2deg(np.arctan(R/(4.2*AU-1.5e6)))*3600} as')
+    #
+    # sJ2 = quadru(1)
+    #
+    # s = sJ2[:3]
+    # J2 = sJ2[3]
+    #
+    # dls = deflection(l0, x, x_a, x_obs, eps, v, MG, s, J2, R)
+    # dln = dls - l0*np.dot(dls, l0)
+    # print(f'dl_n quadru = {np.rad2deg(np.linalg.norm(dln))*3600*1e6} muas')
 
-    # observer
-    x_obs = AU * np.array([0, -1, 0])
+    print('\n--------------- test -------------\nmonopole deflection Sun + Jupiter')
 
-    # impact angle
-    chi = jupiter.radius / np.linalg.norm(x_obs - jupiter.pos)
-    # direction
-    l0 = -np.array([np.sin(chi), np.cos(chi), 0])
-    x = -np.linalg.norm(x - x_obs) * l0 + x_obs
+    star = 1 * pc
 
-    for method in METHODS:
-        print(rad2muas(np.linalg.norm(light_defl(l0, x, jupiter.pos, x_obs, eps, jupiter.mass, method=method))))
+    x_s = np.array([0, 0, 0])  # Sun
+    x_j = np.array([0, 5.2 * AU, 0])  # Jupiter
+    x_obs = np.array([AU, 0, 0])  # Earth
+    x = np.array([0, star, 0])
+    eps = 1 / c
+    v_s = np.array([0, 0, 0])
+    v_j = np.array([0, 0, 0])
+    MG_s = 1.32712440017987e11  # [km^2/s^2]
+    MG_j = 1.26686534e8  # [km^2/s^2]
+    l0 = -(x - x_obs) / (np.linalg.norm(x - x_obs))
 
+    print(f'l0 = {l0}, l0_norm = {np.linalg.norm(l0)}')
+
+    dls = deflection(l0, x, x_s, x_obs, eps, v_s, MG_s)
+    dlj = deflection(l0, x, x_j, x_obs, eps, v_j, MG_j)
+    dls_norm = np.linalg.norm(dls)
+    dlj_norm = np.linalg.norm(dlj)
+    dln_j = dlj - l0 * np.dot(dlj, l0)
+    print(f'dpsi = {np.rad2deg(dlj_norm) * 3600 * 1e6} muas')
+
+    print(dx(l0 - dls, l0, x, x_s, x_obs, eps, v_s, MG_s))
