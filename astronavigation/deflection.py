@@ -114,7 +114,8 @@ def parallax_shift(dl, l0, r):
 
     return dw
 
-def einstein_ring(mg, eps, x_a, x):
+
+def einstein_ring(mg, eps, x_a, x, x_obs):
     """ Evaluate Einstein ring of a black hole.
 
     Parameters
@@ -127,6 +128,8 @@ def einstein_ring(mg, eps, x_a, x):
         mass position (in km)
     x : np.ndarray
         source position (in km)
+    x_obs : np.ndarray
+        obsrver position (in km)
 
     Returns
     -------
@@ -134,8 +137,8 @@ def einstein_ring(mg, eps, x_a, x):
         einsten ring (in rad)
     """
 
-    theta = np.sqrt(4 * mg * (np.linalg.norm(x) - np.linalg.norm(x_a))
-                    / (np.linalg.norm(x) * np.linalg.norm(x_a))) * eps
+    theta = np.sqrt(4 * mg * (np.linalg.norm(x - x_a))
+                    / (np.linalg.norm(x-x_obs) * np.linalg.norm(x_a-x_obs))) * eps
     return theta
 
 

@@ -43,7 +43,7 @@ J2_jup = ss.getPlanet('jupiter').J2
 
 # save parameter
 save = False
-save_latex = False
+save_latex = True
 
 ######################################
 #
@@ -118,6 +118,7 @@ x_stars = [np.array([0, d, 0]) for d in dist]
 for x in x_stars:
 
     # internal loop on the masses, evaluate deflections
+    imp_ang = []
     dl1 = []
     dl2 = []  # w/ null velocities
     dlq = []  # standard quadrupole
@@ -138,9 +139,10 @@ for x in x_stars:
             count += 1
         else:
             # chi = 1 * np.sqrt(4 * pl.mass * (np.linalg.norm(x) - pl.dist) / (np.linalg.norm(x) * pl.dist)) / c
-            chi = einstein_ring(pl.mass, eps, pl.pos, x)
+            chi = einstein_ring(pl.mass, eps, pl.pos, x, x_obs)
 
         print(f'chi: {np.rad2deg(chi)*3600*1e6} muas')
+        imp_ang.append(chi)
 
         # direction
         l0 = -np.array([np.sin(chi), np.cos(chi), 0])
@@ -172,9 +174,9 @@ for x in x_stars:
         cs.append(delta)
 
     # ellis wormhole deflection
-    chi = 1 * np.cbrt(np.pi / 4 * np.linalg.norm(x - worm_1j.pos) * worm_1j.radius ** 2
+    chi_ell = 1 * np.cbrt(np.pi / 4 * np.linalg.norm(x - worm_1j.pos) * worm_1j.radius ** 2
                   / (np.linalg.norm(x - x_obs) * np.linalg.norm(worm_1j.pos - x_obs) ** 2))
-    l0 = -np.array([np.sin(chi), np.cos(chi), 0])
+    l0 = -np.array([np.sin(chi_ell), np.cos(chi_ell), 0])
     x_el = worm_1j.dist * l0 + x_obs
     dls = ellis_deflection(l0, x_el, worm_1j.pos, x_obs, worm_1j.radius)
     # print(f'd: {chi*np.linalg.norm(worm_1j.pos - x_obs)} km')
@@ -207,11 +209,13 @@ for x in x_stars:
         path = f'Data/comparison_d{np.round(np.linalg.norm(x)/pc, 4)}pc'
         save_df(data, columns, rows, path)
 
+    imp_ang = np.array(imp_ang)
     # saving
     if save_latex:
         rows = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune', 'bh $7m_\odot$', 'bh $20m_\odot$', 'pl $3m_J$']
-        columns = ['dl_vn', 'dl', 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
-        data = [np.round(np.rad2deg(dl2) * 3600 * 1e6, 2),
+        columns = ['chi', 'dl_vn', 'dl', 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
+        data = [np.round(rad2muas(imp_ang), 0),
+                np.round(np.rad2deg(dl2) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dl1) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dl_er) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dl_er_c1) * 3600 * 1e6, 2),

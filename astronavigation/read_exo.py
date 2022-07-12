@@ -135,6 +135,58 @@ def getExoAll(df):
 
     return cat
 
+def getExoStar(hostname, df):
+    """
+        Returns the Star which corresponds to the required identification label. Does not
+        give the values of s or J2. If the value of mass or radius is NaN then it is set to zero.
+
+        Parameters
+        ----------
+        hostname : str
+            name of the star
+        df :  pd.DataFrame
+            catalogue in which search for the star
+
+        Returns
+        -------
+        planet : Body
+            required exoplanet
+        """
+
+    system = getExoSystem(hostname, df)
+
+    return system[hostname]
+
+
+def getExoOrbRad(pl_name, df):
+    """
+        Returns the body Orbit Semi-Major Axis in km.
+
+        Parameters
+        ----------
+        pl_name : str
+            name of the planet
+        df :  pd.DataFrame
+            catalogue in which search for the exoplanet
+
+        Returns
+        -------
+        planet : float
+            body Orbit Semi-Major Axis in km
+        """
+
+    df_copy = df.set_index('pl_name')
+    planet = df_copy.loc[pl_name]
+
+    # AU
+    AU = constants.au.to('km').value
+
+    # orb_rad
+    a_p = planet.loc['pl_orbsmax'] * AU
+    if pd.isna(a_p):
+        a_p = 0
+
+    return a_p
 
 if __name__ == "__main__":
 

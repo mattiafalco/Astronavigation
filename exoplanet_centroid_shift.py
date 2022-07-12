@@ -7,6 +7,8 @@ Date: 06/05/22.
 from astronavigation.planets import SolarSystem, Body
 from astropy import constants
 from astronavigation.deflection import *
+from astronavigation.read_exo import *
+
 
 # Define constants
 pc = constants.pc.to('km').value
@@ -36,7 +38,7 @@ for num in np.arange(1, 30, 5):
 
     # impact angle
     n_ring = 1.5
-    theta_e = einstein_ring(pl.mass, eps, pl.pos, x)
+    theta_e = einstein_ring(pl.mass, eps, pl.pos, x, x_obs)
     chi = n_ring*theta_e
     print(f'einstein ring: {np.rad2deg(theta_e)*3600*1e6} muas')
     print(f'einstein ring at distance {dist/pc} pc: {chi*dist} km')
