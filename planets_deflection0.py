@@ -105,11 +105,13 @@ for x in x_stars:
         path = f'Data/max_errors_{np.round(np.linalg.norm(x) / pc, 4)}_pc'
         save_df(data, columns, rows, path)
 
+    dl1 = np.array(dl1)
+    dl2 = np.array(dl2)
     if save_latex:
         rows = list_p
         columns = ['dl_vn', 'dl', 'dlt', 'dlt - sun', 'dr', 'dr - sun']
         data = [np.round(np.rad2deg(dl2)*3600*1e6, 2),
-                np.round(np.rad2deg(dl1)*3600*1e6, 2),
+                np.round(np.rad2deg(dl1-dl2)*3600*1e6, 2),
                 np.round(np.rad2deg(dlt)*3600*1e6, 2),
                 np.round(np.rad2deg(dlt-dlt[0])*3600*1e6, 2),
                 np.round(dr/AU, 2),
@@ -130,7 +132,7 @@ for x in x_stars:
         l0q = -np.array([np.sin(chi), np.cos(chi), 0])
         x = -np.linalg.norm(x - x_obs) * l0q + x_obs
         # deflection
-        dls = deflection(l0q, x, pl.pos, x_obs, eps, pl.vel, pl.mass,
+        dls = deflection(l0q, x, pl.pos, x_obs, eps, pl.mass, pl.vel,
                          np.array([0, 0, 1]), pl.J2, pl.radius)
         dl_q.append(np.linalg.norm(dls))
     dlt_q = np.cumsum(np.array(dl_q))
@@ -157,6 +159,4 @@ for x in x_stars:
         path = f'Data/max_errors_quad_latex'
         save_df(data, columns, rows, path)
 
-
-print(np.rad2deg(4*ss.getPlanet('jupiter').mass/c**2/ss.getPlanet('jupiter').radius)*3600*1e6)
 

@@ -14,6 +14,7 @@ an Ellis wormhole is also considered.
 Creator: Mattia Falco
 Date: 20/04/2022
 """
+import numpy as np
 
 from astronavigation.deflection import *
 from astropy import constants
@@ -43,7 +44,7 @@ J2_jup = ss.getPlanet('jupiter').J2
 
 # save parameter
 save = False
-save_latex = True
+save_latex = False
 
 ######################################
 #
@@ -210,6 +211,10 @@ for x in x_stars:
         save_df(data, columns, rows, path)
 
     imp_ang = np.array(imp_ang)
+    dl_er = np.array(dl_er)
+    dl_er_c1 = np.array(dl_er_c1)
+    dlq_er = np.array(dlq_er)
+    dlq_er_c2 = np.array(dlq_er_c2)
     # saving
     if save_latex:
         rows = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune', 'bh $7m_\odot$', 'bh $20m_\odot$', 'pl $3m_J$']
@@ -218,10 +223,10 @@ for x in x_stars:
                 np.round(np.rad2deg(dl2) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dl1) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dl_er) * 3600 * 1e6, 2),
-                np.round(np.rad2deg(dl_er_c1) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dl_er_c1-dl_er) * 3600 * 1e6, 6),
                 np.round(np.rad2deg(dlq) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dlq_er) * 3600 * 1e6, 2),
-                np.round(np.rad2deg(dlq_er_c2) * 3600 * 1e6, 2),
+                np.round(np.rad2deg(dlq_er_c2-dlq_er) * 3600 * 1e6, 9),
                 np.round(np.rad2deg(cs) * 3600 * 1e6, 2)]
         path = f'Data/comparison_d{np.round(np.linalg.norm(x) / pc, 1)}pc_latex'
         print(path)

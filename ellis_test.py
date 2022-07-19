@@ -43,13 +43,13 @@ save_latex = True
 g = -np.pi/2
 
 # targets
-dist = 10 * pc
+dist = 8000 * pc
 
-radii = np.array([1, 5, 10, 15, 20])
+radii = np.array([1, 10, 100, 1000, 10000])
 
 worms = [Body(mass=0,
-              pos=np.array([0, 3, 0])*pc,
-              radius=n*r_jup) for n in radii]
+              pos=np.array([0, 4000, 0])*pc,
+              radius=n) for n in radii]
 
 #################
 #

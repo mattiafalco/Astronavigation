@@ -479,15 +479,17 @@ def deflection(l0, x, x_a, x_obs, eps, M, v=np.array([0,0,0]),
         p1 = 1 / r_norm - 1 / r_obs_norm
         p2 = l0 - 2 * eps * (2 * dv - d * np.dot(v, r_obs) / d2)
         p3 = 2 * d * ((1 - 2 * eps * np.dot(v, l0)) * (np.dot(n, l0) - np.dot(n_obs, l0))) / d2
-        p4 = r_obs_norm * (dv - 2 * d * np.dot(v, d) / d2) / (d2 * r_norm)
+        p4 = 2 * eps * r_obs_norm * (dv - 2 * d * np.dot(v, d) / d2) / (d2 * r_norm)
         p5 = r_norm - r_obs_norm - np.dot(n_obs, l0) * sigma
 
-        if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\np4*p5{p4 * p5}')
+        if debug: print(f'p1: {p1}\np2: {p2}\np3: {p3}\np4: {p4}\np5: {p5}\n'
+                        f'p1*p2+p3: {p1*p2+p3}\n'
+                        f'p4*p5{p4 * p5}')
 
         # evaluate deflection
-        dl = -M * eps ** 2 * (p1 * p2 + p3) + 2 * M * (eps ** 3) * p4 * p5
+        dl = -M * eps ** 2 * (p1 * p2 + p3) + M * (eps ** 2) * p4 * p5
 
-        if debug: print(f'dl: {dl}')
+        if debug: print(f'dl: {dl}\n')
 
         return dl
     else:

@@ -236,6 +236,7 @@ class SolarSystem(object):
 
         return self.getPlanet('sun', date=date)
 
+
 if __name__ == '__main__':
 
     print('\n------------- Tests with no ephemerides ------------\n')

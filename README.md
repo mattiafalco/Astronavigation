@@ -9,7 +9,7 @@ Here we briefly illustrate the purpose of the programs in this repository. We ar
 In the directory [astronavigation](astronavigation) are written the functions that are used to evaluate the light deflection and to read all the information about the Solar system and the exoplanets.
 
 The main programs are:
-* [error_point.py](error_point.py) evaluates the maximum deflection due to the planets of the Solar System.
+* [error_point.py](planets_deflection0.py) evaluates the maximum deflection due to the planets of the Solar System.
 * [pointing_date.py](pointing_date.py) evalutes the deflection due to planets of the Solar System for the given exoplanets and in a particular range of given dates.
 * [comparison.py](comparison.py) makes a comparison between different formulas and different
 contributions of light deflection. For different types of bodies in the Solar System
