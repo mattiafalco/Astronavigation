@@ -112,10 +112,12 @@ for g in positions:
     print(f'quadrupole er_c2: {np.rad2deg(dlq_er_c2) * 3600 * 1e6} muas')
     print(f'centroid shift: {np.rad2deg(cs) * 3600 * 1e6} muas')
 
+    dl1 = np.array(dl1)
+    dl2 = np.array(dl2)
     # saving
     if save:
         rows = list_p
-        columns = ['dl_vn', 'dlt-sun'] # , 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
+        columns = ['dl_vn', 'dlt-sun', 'dl'] # , 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
         # data = [np.rad2deg(dl2) * 3600 * 1e6,
         #         np.rad2deg(dl1) * 3600 * 1e6,
         #         np.rad2deg(dl_er) * 3600 * 1e6,
@@ -126,6 +128,7 @@ for g in positions:
         #         np.rad2deg(cs) * 3600 * 1e6]
         data = [np.round(np.rad2deg(dl2) * 3600 * 1e6, 4),
                 np.round(np.rad2deg(np.cumsum(dl2)-dl2[0]) * 3600 * 1e6, 4),
+                np.round(rad2muas(dl1 - dl2), 4)
                 ]
         path = f'Data/parallax{count}_latex'
         save_df(data, columns, rows, path)

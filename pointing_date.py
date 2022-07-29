@@ -19,7 +19,7 @@ catalogue = pd.read_csv(path)
 
 # save parameter
 save = False
-save_latex = False
+save_latex = True
 
 ######################################
 #
@@ -37,7 +37,7 @@ targets = ['Proxima Cen b', 'Kepler-220 b', 'Kepler-847 b', 'Kepler-288 b', 'OGL
            # 'GJ 1252 b', 'HR 858 c', 'K2-80 b', 'HAT-P-46 b']
 # date
 date_ref = np.datetime64('2122-01-01T12:00:00')
-month = 24  # set 0 to have only one date
+month = 0  # set 0 to have only one date
 
 #################
 #

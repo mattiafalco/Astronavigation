@@ -80,6 +80,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/comparison_d8000.0pc_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/ellis_deflections.csv">
           <value>
             <Attribute>
@@ -179,6 +186,34 @@
           </value>
         </entry>
         <entry key="/Data/parallax2.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_HAT-P-46 b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_HR 858 c_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_K2-80 b_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_date_KMT-2016-BLG-2605L b_latex.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

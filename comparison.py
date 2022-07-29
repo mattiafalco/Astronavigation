@@ -59,31 +59,36 @@ g = -np.pi/2
 list_p = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune']
 
 # targets
-dist = np.array([10, 500, 1000, 2000]) * pc
+dist = np.array([8000])*pc  # 500, 1000, 2000]) * pc
 
 # exo sources
-list_exo = ['bh_7m', 'bh_20m', 'pl_1j']
+list_exo = ['bh_7m', 'bh_20m', 'pl_3j', 'pl_7j']
 
 bh_7m = Body(mass=7*m_sun,
-             pos=np.array([0, 3, 0])*pc,
+             pos=np.array([0, 4000, 0])*pc,
              radius=r_jup,
              J2=20*r_sun/r_jup*J2_jup)
 
 bh_20m = Body(mass=20*m_sun,
-              pos=np.array([0, 3, 0])*pc,
+              pos=np.array([0, 4000, 0])*pc,
               radius=r_jup,
               J2=20*r_sun/r_jup*J2_jup)
 
-pl_1j = Body(mass=3*m_jup,
-             pos=np.array([0, 8, 0])*pc,
+pl_3j = Body(mass=3*m_jup,
+             pos=np.array([0, 4000, 0])*pc,
              radius=r_jup,
              J2=3*J2_jup)
+
+pl_7j = Body(mass=7*m_jup,
+             pos=np.array([0, 4000, 0])*pc,
+             radius=r_jup,
+             J2=7*J2_jup)
 
 worm_1j = Body(mass=0,
                pos=np.array([0, 3, 0])*pc,
                radius=r_jup)
 
-exos = [bh_7m, bh_20m, pl_1j]
+exos = [bh_7m, bh_20m, pl_3j, pl_7j]
 
 #################
 #
@@ -116,7 +121,7 @@ planets += exos
 x_stars = [np.array([0, d, 0]) for d in dist]
 
 # external loop on the targets
-for x in x_stars:
+for x_r in x_stars:
 
     # internal loop on the masses, evaluate deflections
     imp_ang = []
@@ -142,12 +147,18 @@ for x in x_stars:
             # chi = 1 * np.sqrt(4 * pl.mass * (np.linalg.norm(x) - pl.dist) / (np.linalg.norm(x) * pl.dist)) / c
             chi = einstein_ring(pl.mass, eps, pl.pos, x, x_obs)
 
+            # evaluate t_E
+            r_E = chi * np.linalg.norm(pl.pos - x_obs)
+            t_E = r_E/220
+            print(f't_E: {t_E} s = {t_E/3600} h = {t_E/3600/24} d\n')
+
+
         print(f'chi: {np.rad2deg(chi)*3600*1e6} muas')
         imp_ang.append(chi)
 
         # direction
         l0 = -np.array([np.sin(chi), np.cos(chi), 0])
-        x = -np.linalg.norm(x - x_obs) * l0 + x_obs
+        x = -np.linalg.norm(x_r - x_obs) * l0 + x_obs
 
         # deflection
         dls = deflection(l0, x, pl.pos, x_obs, eps, pl.mass, pl.vel)
@@ -217,16 +228,16 @@ for x in x_stars:
     dlq_er_c2 = np.array(dlq_er_c2)
     # saving
     if save_latex:
-        rows = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune', 'bh $7m_\odot$', 'bh $20m_\odot$', 'pl $3m_J$']
+        rows = ['sun', 'jupiter', 'saturn', 'uranus', 'neptune', 'bh $7m_\odot$', 'bh $20m_\odot$', 'pl $3m_J$', 'pl $7m_J$']
         columns = ['chi', 'dl_vn', 'dl', 'dl_er', 'dl_er_c1', 'dlq', 'dlq_er', 'dlq_er_c2', 'centroid']
         data = [np.round(rad2muas(imp_ang), 0),
                 np.round(np.rad2deg(dl2) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dl1) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dl_er) * 3600 * 1e6, 2),
                 np.round(np.rad2deg(dl_er_c1-dl_er) * 3600 * 1e6, 6),
-                np.round(np.rad2deg(dlq) * 3600 * 1e6, 2),
-                np.round(np.rad2deg(dlq_er) * 3600 * 1e6, 2),
-                np.round(np.rad2deg(dlq_er_c2-dlq_er) * 3600 * 1e6, 9),
+                np.round(np.rad2deg(dlq) * 3600 * 1e6, 6),
+                np.round(np.rad2deg(dlq_er) * 3600 * 1e6, 6),
+                np.round(np.rad2deg(dlq_er_c2-dlq_er) * 3600 * 1e6, 6),
                 np.round(np.rad2deg(cs) * 3600 * 1e6, 2)]
         path = f'Data/comparison_d{np.round(np.linalg.norm(x) / pc, 1)}pc_latex'
         print(path)
