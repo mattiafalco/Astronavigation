@@ -75,7 +75,7 @@ bh_20m = Body(mass=20*m_sun,
               J2=20*r_sun/r_jup*J2_jup)
 
 pl_3j = Body(mass=3*m_jup,
-             pos=np.array([0, 4000, 0])*pc,
+             pos=np.array([0, 8000, 0])*pc,
              radius=r_jup,
              J2=3*J2_jup)
 
@@ -150,10 +150,11 @@ for x_r in x_stars:
             # evaluate t_E
             r_E = chi * np.linalg.norm(pl.pos - x_obs)
             t_E = r_E/220
-            print(f't_E: {t_E} s = {t_E/3600} h = {t_E/3600/24} d\n')
+            print(f't_E: {t_E} s = {t_E/3600} h = {t_E/3600/24} d')
+            print(f'r_E: {r_E/AU} AU')
 
 
-        print(f'chi: {np.rad2deg(chi)*3600*1e6} muas')
+        print(f'chi: {np.rad2deg(chi)*3600*1e6} muas\n')
         imp_ang.append(chi)
 
         # direction

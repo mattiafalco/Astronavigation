@@ -374,6 +374,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/pointing_max_error_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/pointing_max_error_q_latex.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/PS_2022.03.28_05.32.23.csv">
           <value>
             <Attribute>

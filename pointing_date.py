@@ -129,7 +129,7 @@ for date in dates:
         dpsi_tot = np.cumsum(dpsi)
 
         # evaluate dr
-        dr = np.linalg.norm(x - x_obs) * dlt
+        dr = np.linalg.norm(x - x_obs) * dl1
 
         #################
         #
@@ -176,8 +176,8 @@ for date in dates:
                      np.round(np.rad2deg(dl1) * 3600 * 1e6, 2),
                      np.round(np.rad2deg(dlt)*3600*1e6, 2),
                      np.round(np.rad2deg(dlt-dlt[0])*3600*1e6, 2),
-                     np.round(dr/AU, 4),
-                     np.round((dr-dr[0])/AU, 4)],
+                     np.round(dr/AU, 9),
+                     np.round((dr-dr[0])/AU, 9)],
                     columns=columns,
                     index=index,
                     path=path)
